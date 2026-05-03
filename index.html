@@ -7,12 +7,14 @@
 
 <title>شركة تل الوديان للتجارة</title>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
 <style>
 
 body{
     margin:0;
     font-family:Arial;
-    background:linear-gradient(135deg,#0f172a,#1e3c72,#2563eb);
+    background:#0f172a;
 }
 
 /* LOGIN */
@@ -23,32 +25,27 @@ body{
     padding:20px;
     border-radius:12px;
     text-align:center;
-    box-shadow:0 10px 25px rgba(0,0,0,0.3);
 }
 
+/* INPUT */
 input,select{
     width:100%;
     padding:10px;
     margin:8px 0;
-    border-radius:8px;
-    border:1px solid #ccc;
 }
 
+/* BUTTON */
 button{
-    padding:10px 15px;
+    padding:10px;
     margin:5px;
     border:none;
-    border-radius:8px;
-    cursor:pointer;
     background:#2563eb;
     color:white;
+    border-radius:8px;
+    cursor:pointer;
 }
 
-button:hover{
-    background:#1e40af;
-}
-
-/* APP */
+/* MAIN */
 .container{
     max-width:1100px;
     margin:20px auto;
@@ -57,6 +54,7 @@ button:hover{
     border-radius:12px;
 }
 
+/* HEADER */
 header{
     text-align:center;
     background:#111827;
@@ -65,20 +63,50 @@ header{
     border-radius:10px;
 }
 
-nav{
-    display:flex;
-    justify-content:center;
-    gap:10px;
-    flex-wrap:wrap;
-    padding:10px;
-}
-
+/* CARD */
 .card{
+    position:relative;
     background:#f8fafc;
     padding:15px;
     margin-top:15px;
-    border-left:5px solid #2563eb;
     border-radius:10px;
+    border-left:5px solid #2563eb;
+    overflow:hidden;
+}
+
+/* WATERMARK */
+.card::after{
+    content:"شركة تل الوديان للتجارة";
+    position:absolute;
+    font-size:28px;
+    color:rgba(0,0,0,0.05);
+    transform:rotate(-20deg);
+    top:40%;
+    left:10%;
+}
+
+/* IMAGE */
+img{
+    width:120px;
+    margin-top:10px;
+    border-radius:6px;
+}
+
+/* PRINT STYLE */
+@media print{
+
+    body{
+        background:white;
+    }
+
+    button, input, select{
+        display:none;
+    }
+
+    .card{
+        break-inside:avoid;
+    }
+
 }
 
 .hidden{display:none;}
@@ -92,15 +120,12 @@ nav{
 <!-- LOGIN -->
 <div id="loginPage">
 
-<h2 id="loginText">Login</h2>
+<h2>Login</h2>
 
 <input id="user" placeholder="Username">
 <input id="pass" type="password" placeholder="Password">
 
 <button onclick="login()">Login</button>
-<button onclick="toggleLang()">AR / EN</button>
-
-<p>admin / 1234</p>
 
 </div>
 
@@ -112,38 +137,22 @@ nav{
 <p>Vehicle Management System</p>
 </header>
 
-<nav>
-<button onclick="show('admin')">Admin</button>
-<button onclick="show('records')">Records</button>
-<button onclick="logout()">Logout</button>
-</nav>
-
 <div class="container">
 
 <!-- ADMIN -->
 <div id="admin">
 
-<h2 id="invTitle">Invoice System</h2>
+<h2>Add Car</h2>
 
 <input id="carName" placeholder="Car Name">
 <input id="plate" placeholder="Plate Number">
 <input id="model" placeholder="Model">
-
-<!-- FIXED CUSTOMER LABEL -->
 <input id="customer" placeholder="Customer Name">
-
-<input id="phone" placeholder="Phone Number">
-<input id="price" placeholder="Price (VAT)">
+<input id="phone" placeholder="Phone">
+<input id="price" placeholder="Price VAT">
 <input id="fee" placeholder="Transfer Fee">
 
-<select id="transfer">
-<option>Yes</option>
-<option>No</option>
-</select>
-
-<input id="reason" placeholder="Reason if No">
-
-<input id="doc" type="file">
+<input id="image" type="file">
 
 <button onclick="addCar()">Save Car</button>
 
@@ -154,7 +163,7 @@ nav{
 
 <h2>Car Records</h2>
 
-<button onclick="window.print()">Print</button>
+<button onclick="window.print()">Print Invoice</button>
 
 <div id="list"></div>
 
@@ -168,8 +177,6 @@ nav{
 
 let cars=[];
 let inv=1;
-let edit=-1;
-let lang="en";
 
 /* LOGIN */
 function login(){
@@ -184,12 +191,7 @@ alert("Wrong login");
 
 }
 
-/* LOGOUT */
-function logout(){
-location.reload();
-}
-
-/* SHOW PAGES (FIXED - NO BUG) */
+/* SHOW */
 function show(id){
 
 admin.classList.add("hidden");
@@ -204,7 +206,7 @@ render();
 /* ADD CAR */
 function addCar(){
 
-let code="INV-"+String(inv).padStart(2,'0');
+let code="INV-"+String(inv++).padStart(2,'0');
 
 let car={
 invoice:code,
@@ -215,19 +217,10 @@ customer:customer.value,
 phone:phone.value,
 price:price.value,
 fee:fee.value,
-transfer:transfer.value,
-reason:reason.value,
-doc:doc.files[0]?.name||""
+img:image.files[0] ? URL.createObjectURL(image.files[0]) : ""
 };
 
-if(edit===-1){
 cars.push(car);
-inv++;
-}else{
-cars[edit]=car;
-edit=-1;
-}
-
 render();
 
 }
@@ -242,24 +235,21 @@ cars.forEach((c,i)=>{
 html+=`
 <div class="card">
 
-<h3>${c.invoice}</h3>
+<h2>${c.invoice}</h2>
 
 <p><b>Car:</b> ${c.name}</p>
 <p><b>Plate:</b> ${c.plate}</p>
 <p><b>Model:</b> ${c.model}</p>
-
-<!-- FIXED CUSTOMER DISPLAY -->
-<p><b>Customer Name:</b> ${c.customer}</p>
-
+<p><b>Customer:</b> ${c.customer}</p>
 <p><b>Phone:</b> ${c.phone}</p>
 <p><b>Price:</b> ${c.price}</p>
 <p><b>Fee:</b> ${c.fee}</p>
-<p><b>Transfer:</b> ${c.transfer}</p>
-<p><b>Reason:</b> ${c.reason}</p>
-<p><b>Document:</b> ${c.doc}</p>
 
-<button onclick="editCar(${i})">Edit</button>
-<button onclick="deleteCar(${i})">Delete</button>
+${c.img ? `<img src="${c.img}">` : ""}
+
+<div id="qr${i}"></div>
+
+<button onclick="makeQR('${c.invoice}','qr${i}')">Generate QR</button>
 
 </div>
 `;
@@ -270,68 +260,16 @@ list.innerHTML=html;
 
 }
 
-/* DELETE */
-function deleteCar(i){
-cars.splice(i,1);
-render();
-}
+/* QR */
+function makeQR(text,id){
 
-/* EDIT */
-function editCar(i){
+document.getElementById(id).innerHTML="";
 
-let c=cars[i];
-
-carName.value=c.name;
-plate.value=c.plate;
-model.value=c.model;
-customer.value=c.customer;
-phone.value=c.phone;
-price.value=c.price;
-fee.value=c.fee;
-transfer.value=c.transfer;
-reason.value=c.reason;
-
-edit=i;
-show('admin');
-
-}
-
-/* LANGUAGE FIX (SIMPLE WORKING) */
-function toggleLang(){
-
-if(lang==="en"){
-
-lang="ar";
-document.body.style.direction="rtl";
-loginText.innerText="تسجيل الدخول";
-invTitle.innerText="نظام الفواتير";
-
-carName.placeholder="اسم السيارة";
-plate.placeholder="رقم اللوحة";
-model.placeholder="الموديل";
-customer.placeholder="اسم العميل";
-phone.placeholder="رقم الهاتف";
-price.placeholder="السعر شامل الضريبة";
-fee.placeholder="رسوم النقل";
-reason.placeholder="السبب";
-
-}else{
-
-lang="en";
-document.body.style.direction="ltr";
-loginText.innerText="Login";
-invTitle.innerText="Invoice System";
-
-carName.placeholder="Car Name";
-plate.placeholder="Plate Number";
-model.placeholder="Model";
-customer.placeholder="Customer Name";
-phone.placeholder="Phone Number";
-price.placeholder="Price (VAT)";
-fee.placeholder="Transfer Fee";
-reason.placeholder="Reason if No";
-
-}
+new QRCode(document.getElementById(id),{
+text:text,
+width:100,
+height:100
+});
 
 }
 
