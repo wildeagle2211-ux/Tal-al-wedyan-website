@@ -1,138 +1,602 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Tal Al Wadyan Trading</title>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>شركة تل الوديان للتجارة</title>
+
 <style>
-body { font-family: Arial; margin: 0; background:#f3f4f6; }
-header { background:#1d4ed8; color:white; padding:20px; text-align:center; }
-nav { display:flex; gap:10px; justify-content:center; padding:10px; background:white; flex-wrap:wrap; }
-button { padding:10px 15px; border:none; cursor:pointer; background:#2563eb; color:white; border-radius:8px; }
-button:hover { background:#1e40af; }
-.container { max-width:900px; margin:20px auto; background:white; padding:20px; border-radius:10px; }
-input { display:block; width:100%; padding:10px; margin:8px 0; }
-.card { border:1px solid #ddd; padding:10px; margin-top:10px; border-radius:8px; }
-.hidden { display:none; }
+
+body{
+    font-family:Arial;
+    margin:0;
+    background:#f3f4f6;
+}
+
+header{
+    background:#1d4ed8;
+    color:white;
+    padding:20px;
+    text-align:center;
+}
+
+nav{
+    display:flex;
+    gap:10px;
+    justify-content:center;
+    padding:10px;
+    background:white;
+    flex-wrap:wrap;
+}
+
+button{
+    padding:10px 15px;
+    border:none;
+    cursor:pointer;
+    background:#2563eb;
+    color:white;
+    border-radius:8px;
+    cursor:pointer;
+    margin:5px;
+}
+
+button:hover{
+    background:#1e40af;
+}
+
+.container{
+    max-width:1000px;
+    margin:20px auto;
+    background:white;
+    padding:20px;
+    border-radius:10px;
+}
+
+input, select{
+    width:100%;
+    padding:10px;
+    margin:8px 0;
+}
+
+.card{
+    border:1px solid #ddd;
+    padding:15px;
+    margin-top:15px;
+    border-radius:8px;
+    background:#fafafa;
+}
+
+.hidden{
+    display:none;
+}
+
 </style>
+
 </head>
+
 <body>
 
 <!-- LOGIN -->
+
 <div id="loginPage" class="container">
-  <h2>Login</h2>
-  <input id="user" placeholder="Username" />
-  <input id="pass" type="password" placeholder="Password" />
-  <button onclick="login()">Login</button>
-  <p>Demo: admin / 1234</p>
+
+<h2 id="loginTitle">Login</h2>
+
+<input id="user" placeholder="Username">
+
+<input id="pass" type="password" placeholder="Password">
+
+<button onclick="login()">Login</button>
+
+<button onclick="toggleLanguage()">العربية / English</button>
+
+<p>
+Demo Login:
+<br>
+admin
+<br>
+1234
+</p>
+
 </div>
 
 <!-- APP -->
+
 <div id="app" class="hidden">
 
 <header>
-  <h1>Tal Al Wedyan Trading</h1>
+
+<h1 id="companyName">
+شركة تل الوديان للتجارة
+</h1>
+
+<p id="systemTitle">
+Vehicle Trading & Management System
+</p>
+
 </header>
 
 <nav>
-  <button onclick="show('home')">Home</button>
-  <button onclick="show('services')">Services</button>
-  <button onclick="show('records')">Car Records</button>
-  <button onclick="show('admin')">Admin Panel</button>
-  <button onclick="logout()">Logout</button>
+
+<button onclick="show('home')">
+Home
+</button>
+
+<button onclick="show('about')">
+About
+</button>
+
+<button onclick="show('services')">
+Services
+</button>
+
+<button onclick="show('records')">
+Car Records
+</button>
+
+<button onclick="show('admin')">
+Admin Panel
+</button>
+
+<button onclick="show('settings')">
+Settings
+</button>
+
+<button onclick="logout()">
+Logout
+</button>
+
 </nav>
 
 <div class="container">
 
-  <div id="home">
-    <h2>Home</h2>
-    <p>Welcome to Tal Al Wedyan Trading official website.</p>
-  </div>
+<!-- HOME -->
 
-  <div id="services" class="hidden">
-    <h2>Services</h2>
-    <ul>
-      <li>Car Buying & Selling</li>
-      <li>Vehicle Documentation</li>
-      <li>Trade Management</li>
-    </ul>
-  </div>
+<div id="home">
 
-  <div id="records" class="hidden">
-    <h2>Car Records</h2>
-    <div id="carList"></div>
-  </div>
+<h2>
+Welcome
+</h2>
 
-  <div id="admin" class="hidden">
-    <h2>Admin Panel</h2>
-    <input id="carName" placeholder="Car Name" />
-    <input id="model" placeholder="Model" />
-    <input id="plate" placeholder="Plate Number" />
-    <input id="price" placeholder="Price" />
-    <input id="customer" placeholder="Customer Name" />
-    <button onclick="addCar()">Add Car</button>
-  </div>
+<p>
+Welcome to Tal Al Wadyan Trading System
+</p>
 
 </div>
+
+<!-- ABOUT -->
+
+<div id="about" class="hidden">
+
+<h2>
+About Company
+</h2>
+
+<p>
+Professional vehicle trading and transfer management system.
+</p>
+
+</div>
+
+<!-- SERVICES -->
+
+<div id="services" class="hidden">
+
+<h2>
+Services
+</h2>
+
+<ul>
+
+<li>Car Buying & Selling</li>
+
+<li>Vehicle Transfer</li>
+
+<li>Customer Management</li>
+
+<li>Vehicle Documentation</li>
+
+</ul>
+
+</div>
+
+<!-- RECORDS -->
+
+<div id="records" class="hidden">
+
+<h2>
+Car Records
+</h2>
+
+<button onclick="window.print()">
+Print
+</button>
+
+<button onclick="savePDF()">
+Save PDF
+</button>
+
+<div id="carList"></div>
+
+</div>
+
+<!-- ADMIN -->
+
+<div id="admin" class="hidden">
+
+<h2>
+Admin Panel
+</h2>
+
+<input id="carName" placeholder="Car Name">
+
+<input id="plate" placeholder="Car Number Plate">
+
+<input id="model" placeholder="Model">
+
+<input id="customer" placeholder="Customer Name">
+
+<input id="phone" placeholder="Phone Number">
+
+<input id="price" placeholder="Price Including VAT">
+
+<input id="transferFee" placeholder="Car Transfer Fee">
+
+<label>
+Transfer Car:
+</label>
+
+<select id="transfer">
+
+<option value="Yes">
+Yes
+</option>
+
+<option value="No">
+No
+</option>
+
+</select>
+
+<input id="reason" placeholder="If No Enter Reason">
+
+<button onclick="addCar()">
+Add Car
+</button>
+
+</div>
+
+<!-- SETTINGS -->
+
+<div id="settings" class="hidden">
+
+<h2>
+Settings
+</h2>
+
+<input id="newPassword" type="password" placeholder="New Password">
+
+<button onclick="changePassword()">
+Change Password
+</button>
+
+</div>
+
+</div>
+
 </div>
 
 <script>
+
 let cars = [];
 
-function login(){
-  let u = document.getElementById('user').value;
-  let p = document.getElementById('pass').value;
+let password = "1234";
 
-  if(u==='admin' && p==='1234'){
-    document.getElementById('loginPage').classList.add('hidden');
-    document.getElementById('app').classList.remove('hidden');
-  } else {
-    alert('Wrong login');
-  }
+let currentEdit = -1;
+
+let arabic = false;
+
+function login(){
+
+    let u =
+    document.getElementById('user').value;
+
+    let p =
+    document.getElementById('pass').value;
+
+    if(u === 'admin' && p === password){
+
+        document.getElementById('loginPage')
+        .classList.add('hidden');
+
+        document.getElementById('app')
+        .classList.remove('hidden');
+
+    }
+    else{
+
+        alert('Wrong Login');
+
+    }
+
 }
 
 function logout(){
-  location.reload();
+
+    location.reload();
+
 }
 
 function show(id){
-  document.querySelectorAll('.container > div').forEach(d=>d.classList.add('hidden'));
-  document.getElementById(id).classList.remove('hidden');
-  render();
+
+    document.querySelectorAll('.container > div')
+    .forEach(d => d.classList.add('hidden'));
+
+    document.getElementById(id)
+    .classList.remove('hidden');
+
+    render();
+
 }
 
 function addCar(){
-  let car = {
-    name: carName.value,
-    model: model.value,
-    plate: plate.value,
-    price: price.value,
-    customer: customer.value
-  };
-  cars.push(car);
-  alert('Car added');
+
+    let car = {
+
+        name:
+        document.getElementById('carName').value,
+
+        plate:
+        document.getElementById('plate').value,
+
+        model:
+        document.getElementById('model').value,
+
+        customer:
+        document.getElementById('customer').value,
+
+        phone:
+        document.getElementById('phone').value,
+
+        price:
+        document.getElementById('price').value,
+
+        transferFee:
+        document.getElementById('transferFee').value,
+
+        transfer:
+        document.getElementById('transfer').value,
+
+        reason:
+        document.getElementById('reason').value
+
+    };
+
+    if(currentEdit === -1){
+
+        cars.push(car);
+
+    }
+    else{
+
+        cars[currentEdit] = car;
+
+        currentEdit = -1;
+
+    }
+
+    alert('Saved Successfully');
+
+    render();
+
 }
 
 function render(){
-  let html = '';
-  cars.forEach((c,i)=>{
-    html += `<div class='card'>
-      <b>${c.name}</b><br/>
-      Model: ${c.model}<br/>
-      Plate: ${c.plate}<br/>
-      Price: ${c.price}<br/>
-      Customer: ${c.customer}<br/>
-      <button onclick='deleteCar(${i})'>Delete</button>
-    </div>`;
-  });
-  document.getElementById('carList').innerHTML = html;
+
+    let html = '';
+
+    cars.forEach((c,i)=>{
+
+        html += `
+
+        <div class='card'>
+
+        <h3>${c.name}</h3>
+
+        <p>
+        <b>Plate:</b>
+        ${c.plate}
+        </p>
+
+        <p>
+        <b>Model:</b>
+        ${c.model}
+        </p>
+
+        <p>
+        <b>Customer:</b>
+        ${c.customer}
+        </p>
+
+        <p>
+        <b>Phone:</b>
+        ${c.phone}
+        </p>
+
+        <p>
+        <b>Price VAT:</b>
+        ${c.price}
+        </p>
+
+        <p>
+        <b>Transfer Fee:</b>
+        ${c.transferFee}
+        </p>
+
+        <p>
+        <b>Transfer:</b>
+        ${c.transfer}
+        </p>
+
+        <p>
+        <b>Reason:</b>
+        ${c.reason}
+        </p>
+
+        <button onclick="editCar(${i})">
+        Edit
+        </button>
+
+        <button onclick="deleteCar(${i})">
+        Delete
+        </button>
+
+        </div>
+
+        `;
+
+    });
+
+    document.getElementById('carList')
+    .innerHTML = html;
+
 }
 
 function deleteCar(i){
-  cars.splice(i,1);
-  render();
+
+    cars.splice(i,1);
+
+    render();
+
 }
+
+function editCar(i){
+
+    let c = cars[i];
+
+    document.getElementById('carName').value = c.name;
+
+    document.getElementById('plate').value = c.plate;
+
+    document.getElementById('model').value = c.model;
+
+    document.getElementById('customer').value = c.customer;
+
+    document.getElementById('phone').value = c.phone;
+
+    document.getElementById('price').value = c.price;
+
+    document.getElementById('transferFee').value = c.transferFee;
+
+    document.getElementById('transfer').value = c.transfer;
+
+    document.getElementById('reason').value = c.reason;
+
+    currentEdit = i;
+
+    show('admin');
+
+}
+
+function savePDF(){
+
+    let content =
+    document.getElementById('carList').innerHTML;
+
+    let win =
+    window.open('', '', 'width=900,height=700');
+
+    win.document.write(`
+
+    <html>
+
+    <head>
+
+    <title>
+    PDF Report
+    </title>
+
+    <style>
+
+    body{
+        font-family:Arial;
+        padding:20px;
+    }
+
+    .card{
+        border:1px solid #ccc;
+        padding:15px;
+        margin-bottom:15px;
+    }
+
+    </style>
+
+    </head>
+
+    <body>
+
+    <h1>
+    شركة تل الوديان للتجارة
+    </h1>
+
+    ${content}
+
+    </body>
+
+    </html>
+
+    `);
+
+    win.document.close();
+
+    win.print();
+
+}
+
+function changePassword(){
+
+    let np =
+    document.getElementById('newPassword').value;
+
+    if(np !== ''){
+
+        password = np;
+
+        alert('Password Changed');
+
+    }
+
+}
+
+function toggleLanguage(){
+
+    arabic = !arabic;
+
+    if(arabic){
+
+        document.body.style.direction = 'rtl';
+
+        document.getElementById('loginTitle')
+        .innerText = 'تسجيل الدخول';
+
+    }
+    else{
+
+        document.body.style.direction = 'ltr';
+
+        document.getElementById('loginTitle')
+        .innerText = 'Login';
+
+    }
+
+}
+
 </script>
 
 </body>
+
 </html>
