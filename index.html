@@ -7,70 +7,97 @@
 
 <title>شركة تل الوديان للتجارة</title>
 
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+
 <style>
 
 body{
     margin:0;
-    font-family:Arial;
-    background:linear-gradient(135deg,#0f172a,#1e3c72,#2a5298);
-    color:white;
+    font-family:'Roboto', sans-serif;
+    background:linear-gradient(135deg,#0f172a,#1e3c72,#2563eb);
 }
 
-.container{
-    max-width:1100px;
-    margin:20px auto;
+/* LOGIN */
+#loginPage{
+    width:350px;
+    margin:80px auto;
     background:white;
-    color:black;
-    padding:20px;
+    padding:25px;
     border-radius:12px;
-    box-shadow:0 0 20px rgba(0,0,0,0.3);
+    text-align:center;
+    box-shadow:0 10px 30px rgba(0,0,0,0.3);
 }
 
-header{
-    text-align:center;
-    padding:20px;
-    background:#111827;
-    color:white;
-    border-radius:10px;
+input{
+    width:100%;
+    padding:10px;
+    margin:8px 0;
+    border:1px solid #ddd;
+    border-radius:8px;
 }
 
 button{
-    padding:10px 15px;
-    margin:5px;
+    width:100%;
+    padding:10px;
+    margin-top:10px;
     border:none;
     border-radius:8px;
-    cursor:pointer;
     background:#2563eb;
     color:white;
+    cursor:pointer;
 }
 
 button:hover{
     background:#1e40af;
 }
 
-input,select{
-    width:100%;
-    padding:10px;
-    margin:8px 0;
-    border-radius:6px;
-    border:1px solid #ccc;
+/* HEADER */
+header{
+    background:#0f172a;
+    color:white;
+    text-align:center;
+    padding:20px;
 }
 
+/* NAV */
+nav{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    padding:10px;
+    background:white;
+    flex-wrap:wrap;
+}
+
+nav button{
+    width:auto;
+    padding:8px 15px;
+}
+
+/* CONTAINER */
+.container{
+    max-width:1100px;
+    margin:20px auto;
+    background:white;
+    padding:20px;
+    border-radius:12px;
+}
+
+/* CARD */
 .card{
-    border:1px solid #ddd;
+    background:#f8fafc;
+    border-left:5px solid #2563eb;
     padding:15px;
     margin-top:15px;
     border-radius:10px;
-    background:#f9fafb;
 }
 
+/* HIDDEN */
 .hidden{display:none;}
 
-nav{
-    display:flex;
-    gap:10px;
-    justify-content:center;
-    flex-wrap:wrap;
+h2{
+    color:#0f172a;
 }
 
 </style>
@@ -80,8 +107,7 @@ nav{
 <body id="body">
 
 <!-- LOGIN -->
-
-<div id="loginPage" class="container" style="text-align:center;">
+<div id="loginPage">
 
 <h2 id="loginText">Login</h2>
 
@@ -91,38 +117,30 @@ nav{
 <button onclick="login()">Login</button>
 <button onclick="toggleLang()">AR / EN</button>
 
-<p>admin / 1234</p>
+<p style="font-size:12px;color:gray;">admin / 1234</p>
 
 </div>
 
 <!-- APP -->
-
 <div id="app" class="hidden">
 
 <header>
-
 <h1>شركة تل الوديان للتجارة</h1>
 <p>Vehicle Management System</p>
-
 </header>
 
 <nav>
-
 <button onclick="show('admin')">Admin</button>
 <button onclick="show('records')">Records</button>
 <button onclick="logout()">Logout</button>
-
 </nav>
 
 <div class="container">
 
 <!-- ADMIN -->
-
 <div id="admin">
 
-<h2>Admin Panel</h2>
-
-<h3 id="invBox">Invoice System</h3>
+<h2 id="invBox">Invoice System</h2>
 
 <input id="carName" placeholder="Car Name">
 <input id="plate" placeholder="Plate Number">
@@ -146,7 +164,6 @@ nav{
 </div>
 
 <!-- RECORDS -->
-
 <div id="records" class="hidden">
 
 <h2>Car Records</h2>
@@ -169,26 +186,28 @@ let inv=1;
 let edit=-1;
 let lang="en";
 
+/* LOGIN */
 function login(){
 
 if(user.value==="admin" && pass.value==="1234"){
-
 loginPage.classList.add("hidden");
 app.classList.remove("hidden");
-
+show('admin');
 }else{
 alert("Wrong login");
 }
 
 }
 
+/* LOGOUT */
 function logout(){
 location.reload();
 }
 
+/* SHOW */
 function show(id){
 
-document.querySelectorAll(".container > div")
+document.querySelectorAll("#app > div")
 .forEach(d=>d.classList.add("hidden"));
 
 document.getElementById(id).classList.remove("hidden");
@@ -197,12 +216,12 @@ render();
 
 }
 
+/* ADD CAR */
 function addCar(){
 
 let code="INV-"+String(inv).padStart(2,'0');
 
 let car={
-
 invoice:code,
 name:carName.value,
 plate:plate.value,
@@ -214,7 +233,6 @@ fee:fee.value,
 transfer:transfer.value,
 reason:reason.value,
 doc:doc.files[0]?.name||""
-
 };
 
 if(edit===-1){
@@ -229,6 +247,7 @@ render();
 
 }
 
+/* RENDER */
 function render(){
 
 let html="";
@@ -236,27 +255,25 @@ let html="";
 cars.forEach((c,i)=>{
 
 html+=`
-
 <div class="card">
 
 <h3>${c.invoice}</h3>
 
-<p>Car: ${c.name}</p>
-<p>Plate: ${c.plate}</p>
-<p>Model: ${c.model}</p>
-<p>Customer: ${c.customer}</p>
-<p>Phone: ${c.phone}</p>
-<p>Price: ${c.price}</p>
-<p>Fee: ${c.fee}</p>
-<p>Transfer: ${c.transfer}</p>
-<p>Reason: ${c.reason}</p>
-<p>Document: ${c.doc}</p>
+<p><b>Car:</b> ${c.name}</p>
+<p><b>Plate:</b> ${c.plate}</p>
+<p><b>Model:</b> ${c.model}</p>
+<p><b>Customer:</b> ${c.customer}</p>
+<p><b>Phone:</b> ${c.phone}</p>
+<p><b>Price:</b> ${c.price}</p>
+<p><b>Fee:</b> ${c.fee}</p>
+<p><b>Transfer:</b> ${c.transfer}</p>
+<p><b>Reason:</b> ${c.reason}</p>
+<p><b>Doc:</b> ${c.doc}</p>
 
 <button onclick="editCar(${i})">Edit</button>
 <button onclick="deleteCar(${i})">Delete</button>
 
 </div>
-
 `;
 
 });
@@ -265,11 +282,13 @@ list.innerHTML=html;
 
 }
 
+/* DELETE */
 function deleteCar(i){
 cars.splice(i,1);
 render();
 }
 
+/* EDIT */
 function editCar(i){
 
 let c=cars[i];
@@ -289,29 +308,47 @@ show('admin');
 
 }
 
+/* PDF */
 function savePDF(){
-
 let w=window.open();
-
-w.document.write("<h1>Company Invoice Report</h1>"+list.innerHTML);
-
+w.document.write(list.innerHTML);
 w.print();
-
 }
 
+/* LANGUAGE */
 function toggleLang(){
 
 if(lang==="en"){
 
+lang="ar";
 document.body.style.direction="rtl";
 loginText.innerText="تسجيل الدخول";
-lang="ar";
+invBox.innerText="نظام الفواتير";
+
+carName.placeholder="اسم السيارة";
+plate.placeholder="رقم اللوحة";
+model.placeholder="الموديل";
+customer.placeholder="اسم العميل";
+phone.placeholder="رقم الهاتف";
+price.placeholder="السعر شامل الضريبة";
+fee.placeholder="رسوم النقل";
+reason.placeholder="السبب";
 
 }else{
 
+lang="en";
 document.body.style.direction="ltr";
 loginText.innerText="Login";
-lang="en";
+invBox.innerText="Invoice System";
+
+carName.placeholder="Car Name";
+plate.placeholder="Plate Number";
+model.placeholder="Model";
+customer.placeholder="Customer Name";
+phone.placeholder="Phone Number";
+price.placeholder="Price (VAT)";
+fee.placeholder="Transfer Fee";
+reason.placeholder="Reason if No";
 
 }
 
