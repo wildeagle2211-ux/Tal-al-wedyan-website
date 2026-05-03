@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tal Al Wadyan Trading</title>
+<style>
+body { font-family: Arial; margin: 0; background:#f3f4f6; }
+header { background:#1d4ed8; color:white; padding:20px; text-align:center; }
+nav { display:flex; gap:10px; justify-content:center; padding:10px; background:white; flex-wrap:wrap; }
+button { padding:10px 15px; border:none; cursor:pointer; background:#2563eb; color:white; border-radius:8px; }
+button:hover { background:#1e40af; }
+.container { max-width:900px; margin:20px auto; background:white; padding:20px; border-radius:10px; }
+input { display:block; width:100%; padding:10px; margin:8px 0; }
+.card { border:1px solid #ddd; padding:10px; margin-top:10px; border-radius:8px; }
+.hidden { display:none; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginPage" class="container">
+  <h2>Login</h2>
+  <input id="user" placeholder="Username" />
+  <input id="pass" type="password" placeholder="Password" />
+  <button onclick="login()">Login</button>
+  <p>Demo: admin / 1234</p>
+</div>
+
+<!-- APP -->
+<div id="app" class="hidden">
+
+<header>
+  <h1>Tal Al Wedyan Trading</h1>
+</header>
+
+<nav>
+  <button onclick="show('home')">Home</button>
+  <button onclick="show('services')">Services</button>
+  <button onclick="show('records')">Car Records</button>
+  <button onclick="show('admin')">Admin Panel</button>
+  <button onclick="logout()">Logout</button>
+</nav>
+
+<div class="container">
+
+  <div id="home">
+    <h2>Home</h2>
+    <p>Welcome to Tal Al Wedyan Trading official website.</p>
+  </div>
+
+  <div id="services" class="hidden">
+    <h2>Services</h2>
+    <ul>
+      <li>Car Buying & Selling</li>
+      <li>Vehicle Documentation</li>
+      <li>Trade Management</li>
+    </ul>
+  </div>
+
+  <div id="records" class="hidden">
+    <h2>Car Records</h2>
+    <div id="carList"></div>
+  </div>
+
+  <div id="admin" class="hidden">
+    <h2>Admin Panel</h2>
+    <input id="carName" placeholder="Car Name" />
+    <input id="model" placeholder="Model" />
+    <input id="plate" placeholder="Plate Number" />
+    <input id="price" placeholder="Price" />
+    <input id="customer" placeholder="Customer Name" />
+    <button onclick="addCar()">Add Car</button>
+  </div>
+
+</div>
+</div>
+
+<script>
+let cars = [];
+
+function login(){
+  let u = document.getElementById('user').value;
+  let p = document.getElementById('pass').value;
+
+  if(u==='admin' && p==='1234'){
+    document.getElementById('loginPage').classList.add('hidden');
+    document.getElementById('app').classList.remove('hidden');
+  } else {
+    alert('Wrong login');
+  }
+}
+
+function logout(){
+  location.reload();
+}
+
+function show(id){
+  document.querySelectorAll('.container > div').forEach(d=>d.classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+  render();
+}
+
+function addCar(){
+  let car = {
+    name: carName.value,
+    model: model.value,
+    plate: plate.value,
+    price: price.value,
+    customer: customer.value
+  };
+  cars.push(car);
+  alert('Car added');
+}
+
+function render(){
+  let html = '';
+  cars.forEach((c,i)=>{
+    html += `<div class='card'>
+      <b>${c.name}</b><br/>
+      Model: ${c.model}<br/>
+      Plate: ${c.plate}<br/>
+      Price: ${c.price}<br/>
+      Customer: ${c.customer}<br/>
+      <button onclick='deleteCar(${i})'>Delete</button>
+    </div>`;
+  });
+  document.getElementById('carList').innerHTML = html;
+}
+
+function deleteCar(i){
+  cars.splice(i,1);
+  render();
+}
+</script>
+
+</body>
+</html>
