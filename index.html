@@ -74,37 +74,42 @@ header{
     overflow:hidden;
 }
 
-/* WATERMARK */
+/* WATERMARK (COMPANY NAME PRINT LOOK) */
 .card::after{
     content:"شركة تل الوديان للتجارة";
     position:absolute;
-    font-size:28px;
+    font-size:30px;
     color:rgba(0,0,0,0.05);
     transform:rotate(-20deg);
     top:40%;
     left:10%;
 }
 
-/* IMAGE */
+/* IMAGE FIX */
 img{
     width:120px;
     margin-top:10px;
-    border-radius:6px;
+    border-radius:8px;
 }
 
-/* PRINT STYLE */
+/* PRINT FIX (IMPORTANT) */
 @media print{
 
     body{
         background:white;
     }
 
-    button, input, select{
+    button{
         display:none;
     }
 
     .card{
-        break-inside:avoid;
+        page-break-inside:avoid;
+    }
+
+    /* make watermark visible better */
+    .card::after{
+        color:rgba(0,0,0,0.08);
     }
 
 }
@@ -152,6 +157,7 @@ img{
 <input id="price" placeholder="Price VAT">
 <input id="fee" placeholder="Transfer Fee">
 
+<!-- FIX IMAGE -->
 <input id="image" type="file">
 
 <button onclick="addCar()">Save Car</button>
@@ -185,8 +191,6 @@ if(user.value==="admin" && pass.value==="1234"){
 loginPage.classList.add("hidden");
 app.classList.remove("hidden");
 show('admin');
-}else{
-alert("Wrong login");
 }
 
 }
@@ -208,6 +212,13 @@ function addCar(){
 
 let code="INV-"+String(inv++).padStart(2,'0');
 
+/* FIX IMAGE SAVE (base64 for print) */
+let file=image.files[0];
+
+let reader=new FileReader();
+
+reader.onload=function(){
+
 let car={
 invoice:code,
 name:carName.value,
@@ -217,11 +228,34 @@ customer:customer.value,
 phone:phone.value,
 price:price.value,
 fee:fee.value,
-img:image.files[0] ? URL.createObjectURL(image.files[0]) : ""
+img:reader.result
 };
 
 cars.push(car);
 render();
+
+};
+
+if(file){
+reader.readAsDataURL(file);
+}else{
+
+let car={
+invoice:code,
+name:carName.value,
+plate:plate.value,
+model:model.value,
+customer:customer.value,
+phone:phone.value,
+price:price.value,
+fee:fee.value,
+img:""
+};
+
+cars.push(car);
+render();
+
+}
 
 }
 
@@ -260,7 +294,7 @@ list.innerHTML=html;
 
 }
 
-/* QR */
+/* QR FIX (AUTO CALL ALSO) */
 function makeQR(text,id){
 
 document.getElementById(id).innerHTML="";
