@@ -2,173 +2,165 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>شركة تل الوديان للتجارة</title>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-
 <style>
-
 body{
     margin:0;
-    font-family:Segoe UI;
+    font-family:Arial;
     background:#0f172a;
 }
 
-/* LOGIN */
-#loginPage{
-    width:320px;
-    margin:80px auto;
-    background:white;
-    padding:20px;
-    border-radius:10px;
+/* HEADER */
+header{
+    background:#111827;
+    color:white;
+    padding:15px;
     text-align:center;
 }
 
+/* LAYOUT */
+.main{
+    display:flex;
+    gap:20px;
+    padding:20px;
+}
+
+/* LEFT PANEL */
+.form-box{
+    width:35%;
+    background:white;
+    padding:15px;
+    border-radius:10px;
+}
+
+/* RIGHT PANEL */
+.data-box{
+    width:65%;
+    background:white;
+    padding:15px;
+    border-radius:10px;
+}
+
+/* INPUT */
 input,select{
     width:100%;
-    padding:10px;
-    margin:6px 0;
+    padding:8px;
+    margin:5px 0;
 }
 
 /* BUTTON */
 button{
-    padding:10px;
+    padding:8px 12px;
     margin:5px;
-    border:none;
     background:#2563eb;
     color:white;
+    border:none;
     border-radius:6px;
     cursor:pointer;
 }
 
-/* APP */
-.container{
-    max-width:1100px;
-    margin:20px auto;
-    background:white;
-    padding:20px;
-    border-radius:10px;
+/* TABLE */
+table{
+    width:100%;
+    border-collapse:collapse;
 }
 
-/* FORM */
-.grid{
-    display:grid;
-    grid-template-columns:1fr 2fr;
-    gap:10px;
-}
-
-label{font-weight:bold;}
-
-.card{
+th,td{
     border:1px solid #ddd;
-    padding:20px;
-    margin-top:20px;
-    page-break-inside:avoid;
-}
-
-/* HEADER INVOICE */
-.invoice-header{
+    padding:8px;
     text-align:center;
-    border-bottom:2px solid #000;
-    margin-bottom:10px;
 }
 
-.invoice-header h2{
-    margin:5px 0;
+th{
+    background:#1e3a8a;
+    color:white;
 }
 
-/* IMAGE */
 img{
-    width:130px;
-    margin-top:10px;
+    width:60px;
 }
 
-/* PRINT */
-@media print{
-button,input,select{display:none;}
-body{background:white;}
+/* MSG */
+#msg{
+    color:green;
+    font-weight:bold;
 }
-
-.hidden{display:none;}
-#msg{color:green;font-weight:bold;}
-
 </style>
 </head>
 
 <body>
 
-<!-- LOGIN -->
-<div id="loginPage">
-<h2 id="loginText">Login</h2>
-<input id="user" placeholder="Username">
-<input id="pass" type="password" placeholder="Password">
-<button onclick="login()">Login</button>
-<button onclick="toggleLang()">AR / EN</button>
-<p>admin / 1234</p>
-</div>
-
-<!-- APP -->
-<div id="app" class="hidden">
-
-<div class="container">
-
+<header>
 <h2>شركة تل الوديان للتجارة</h2>
+<p>Vehicle Management System</p>
+</header>
+
+<div class="main">
+
+<!-- FORM -->
+<div class="form-box">
+
+<h3>Admin Panel</h3>
 
 <p id="msg"></p>
 
+<input id="carName" placeholder="Car Name">
+<input id="plate" placeholder="Plate Number">
+<input id="model" placeholder="Model">
+<input id="customer" placeholder="Customer Name">
+<input id="phone" placeholder="Phone Number">
+<input id="price" placeholder="Price with VAT">
+<input id="fee" placeholder="Transfer Fee">
+
+<select id="transfer">
+<option>Yes</option>
+<option>No</option>
+</select>
+
+<input id="reason" placeholder="Reason">
+
+<input type="file" id="img">
+
+<button onclick="save()">Save Car</button>
+
+</div>
+
+<!-- DATA -->
+<div class="data-box">
+
+<h3>Records</h3>
+
 <input id="search" placeholder="Search..." onkeyup="searchData()">
 
-<div class="grid">
+<table>
+<thead>
+<tr>
+<th>Invoice</th>
+<th>Car</th>
+<th>Plate</th>
+<th>Customer</th>
+<th>Image</th>
+<th>Action</th>
+</tr>
+</thead>
 
-<label id="l1">Car Name</label><input id="carName">
-<label id="l2">Plate Number</label><input id="plate">
-<label id="l3">Model</label><input id="model">
-<label id="l4">Customer Name</label><input id="customer">
-<label id="l5">Phone Number</label><input id="phone">
-<label id="l6">Price with VAT</label><input id="price">
-<label id="l7">Transfer Fee</label><input id="fee">
-<label id="l8">Transfer</label>
-<select id="transfer"><option>Yes</option><option>No</option></select>
-<label id="l9">Reason</label><input id="reason">
+<tbody id="tableData"></tbody>
 
-<label>Image</label><input type="file" id="img">
-<label>Document</label><input type="file" id="doc">
-
-</div>
-
-<button onclick="saveData()">Save</button>
-<button onclick="window.print()">Print Invoice</button>
-
-<hr>
-
-<div id="list"></div>
+</table>
 
 </div>
+
 </div>
 
 <script>
 
 let cars=JSON.parse(localStorage.getItem("cars"))||[];
-let inv=cars.length+1;
 let editIndex=-1;
-let lang="en";
-
-/* LOGIN */
-function login(){
-if(user.value==="admin" && pass.value==="1234"){
-loginPage.style.display="none";
-app.style.display="block";
-render();
-}else alert("Wrong login");
-}
+let inv=cars.length+1;
 
 /* SAVE */
-function saveData(){
-
-let code="INV-"+String(inv).padStart(2,'0');
-let date=new Date().toLocaleDateString();
+function save(){
 
 let reader=new FileReader();
 let file=img.files[0];
@@ -176,23 +168,15 @@ let file=img.files[0];
 reader.onload=function(){
 
 let data={
-inv:code,
-date:date,
-name:carName.value,
+invoice:"INV-"+inv++,
+car:carName.value,
 plate:plate.value,
-model:model.value,
 customer:customer.value,
-phone:phone.value,
-price:price.value,
-fee:fee.value,
-transfer:transfer.value,
-reason:reason.value,
 img:reader.result
 };
 
 if(editIndex===-1){
 cars.push(data);
-inv++;
 }else{
 cars[editIndex]=data;
 editIndex=-1;
@@ -200,19 +184,14 @@ editIndex=-1;
 
 localStorage.setItem("cars",JSON.stringify(cars));
 msg.innerText="✔ Saved Successfully";
-clearForm();
 render();
+clearForm();
 
 };
 
 if(file) reader.readAsDataURL(file);
 else reader.onload();
 
-}
-
-/* CLEAR */
-function clearForm(){
-document.querySelectorAll("input").forEach(i=>i.value="");
 }
 
 /* RENDER */
@@ -223,41 +202,22 @@ let html="";
 cars.forEach((c,i)=>{
 
 html+=`
-<div class="card">
-
-<div class="invoice-header">
-<h2>شركة تل الوديان للتجارة</h2>
-<h4>Tal Al Wadyan Trading</h4>
-</div>
-
-<p><b>Invoice:</b> ${c.inv}</p>
-<p><b>Date:</b> ${c.date}</p>
-
-<p><b>Car:</b> ${c.name}</p>
-<p><b>Plate:</b> ${c.plate}</p>
-<p><b>Model:</b> ${c.model}</p>
-<p><b>Customer:</b> ${c.customer}</p>
-<p><b>Phone:</b> ${c.phone}</p>
-<p><b>Price with VAT:</b> ${c.price}</p>
-<p><b>Fee:</b> ${c.fee}</p>
-<p><b>Transfer:</b> ${c.transfer}</p>
-<p><b>Reason:</b> ${c.reason}</p>
-
-${c.img?`<img src="${c.img}">`:""}
-
-<div id="qr${i}"></div>
-
-<button onclick="makeQR('${c.inv}','qr${i}')">QR</button>
-
+<tr>
+<td>${c.invoice}</td>
+<td>${c.car}</td>
+<td>${c.plate}</td>
+<td>${c.customer}</td>
+<td>${c.img?`<img src="${c.img}">`:""}</td>
+<td>
 <button onclick="edit(${i})">Edit</button>
 <button onclick="del(${i})">Delete</button>
-
-</div>
+</td>
+</tr>
 `;
 
 });
 
-list.innerHTML=html;
+tableData.innerHTML=html;
 
 }
 
@@ -270,63 +230,45 @@ render();
 
 /* EDIT */
 function edit(i){
+
 let c=cars[i];
-carName.value=c.name;
+
+carName.value=c.car;
 plate.value=c.plate;
-model.value=c.model;
 customer.value=c.customer;
-phone.value=c.phone;
-price.value=c.price;
-fee.value=c.fee;
-reason.value=c.reason;
+
 editIndex=i;
+
 }
 
 /* SEARCH */
 function searchData(){
+
 let val=search.value.toLowerCase();
+
 let filtered=cars.filter(c =>
-c.inv.toLowerCase().includes(val) ||
+c.invoice.toLowerCase().includes(val) ||
 c.plate.toLowerCase().includes(val) ||
 c.customer.toLowerCase().includes(val)
 );
-list.innerHTML=filtered.map(c=>`<div class="card"><h3>${c.inv}</h3><p>${c.customer}</p></div>`).join("");
+
+let html="";
+
+filtered.forEach(c=>{
+html+=`<tr><td>${c.invoice}</td><td>${c.car}</td><td>${c.plate}</td><td>${c.customer}</td></tr>`;
+});
+
+tableData.innerHTML=html;
+
 }
 
-/* QR */
-function makeQR(text,id){
-document.getElementById(id).innerHTML="";
-new QRCode(document.getElementById(id),{text:text,width:100,height:100});
+/* CLEAR */
+function clearForm(){
+document.querySelectorAll(".form-box input").forEach(i=>i.value="");
 }
 
-/* LANGUAGE */
-function toggleLang(){
-if(lang==="en"){
-lang="ar";
-document.body.style.direction="rtl";
-l1.innerText="اسم السيارة";
-l2.innerText="رقم اللوحة";
-l3.innerText="الموديل";
-l4.innerText="اسم العميل";
-l5.innerText="رقم الهاتف";
-l6.innerText="السعر شامل الضريبة";
-l7.innerText="رسوم النقل";
-l8.innerText="نقل";
-l9.innerText="السبب";
-}else{
-lang="en";
-document.body.style.direction="ltr";
-l1.innerText="Car Name";
-l2.innerText="Plate Number";
-l3.innerText="Model";
-l4.innerText="Customer Name";
-l5.innerText="Phone Number";
-l6.innerText="Price with VAT";
-l7.innerText="Transfer Fee";
-l8.innerText="Transfer";
-l9.innerText="Reason";
-}
-}
+/* INIT */
+render();
 
 </script>
 
