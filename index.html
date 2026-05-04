@@ -13,6 +13,7 @@ body{
     color:white;
 }
 
+/* LOGIN */
 #loginBox{
     position:fixed;
     inset:0;
@@ -29,6 +30,7 @@ body{
     width:300px;
 }
 
+/* MAIN */
 .container{max-width:1000px;margin:auto;}
 .card{background:#111827;padding:20px;border-radius:12px;}
 
@@ -62,7 +64,24 @@ th, td{
     text-align:center;
 }
 
-th{background:#1f2937;}
+th{
+    background:#1f2937;
+}
+
+/* PRINT */
+@media print{
+    body{background:white;color:black;}
+    #loginBox,
+    button,
+    input,
+    select{
+        display:none !important;
+    }
+    .card{
+        background:white;
+        color:black;
+    }
+}
 </style>
 
 </head>
@@ -82,7 +101,7 @@ th{background:#1f2937;}
 <div class="container">
 <div class="card">
 
-<!-- 🇸🇦 HEADER (Arabic FIXED) -->
+<!-- 🇸🇦 HEADER -->
 <div style="text-align:center;margin-bottom:10px;">
     <h2>🚗 شركة تل الوديان للتجارة - +966539115111</h2>
     <p>Car Transfer System Pro</p>
@@ -103,8 +122,10 @@ th{background:#1f2937;}
 
 <input type="file" id="file">
 
+<!-- BUTTONS -->
 <button onclick="addData()">Add Record</button>
 <button onclick="saveData()">Save Record</button>
+<button onclick="window.print()">Print / طباعة</button>
 
 <table>
 <thead>
@@ -143,7 +164,7 @@ function login(){
     }
 }
 
-/* PASSWORD CHANGE */
+/* CHANGE PASSWORD */
 function changePassword(){
     let old = prompt("Old Password?");
     if(old !== password){
@@ -199,6 +220,7 @@ function addData(){
         };
 
         reader.readAsDataURL(file);
+
     } else {
 
         data.push({
@@ -271,9 +293,11 @@ function render(){
             <td>${item.fee}</td>
             <td>${item.status}</td>
             <td>${item.reason || "-"}</td>
+
             <td>
                 ${item.file ? `<img src="${item.file}" width="60"/>` : "-"}
             </td>
+
             <td>
                 <button onclick="editData(${item.id})">Edit</button>
                 <button onclick="deleteData(${item.id})">Delete</button>
