@@ -2,7 +2,8 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Car Transfer System Pro</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tal Al Wedyan - Car System</title>
 
 <style>
 body{
@@ -11,23 +12,6 @@ body{
     padding:20px;
     background:#0f172a;
     color:white;
-}
-
-/* LOGIN */
-#loginBox{
-    position:fixed;
-    inset:0;
-    background:#000000ee;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-}
-
-.loginCard{
-    background:#111827;
-    padding:20px;
-    border-radius:10px;
-    width:300px;
 }
 
 .container{max-width:1000px;margin:auto;}
@@ -69,59 +53,32 @@ img{
     max-width:70px;
     border-radius:5px;
 }
-
-/* PRINT */
-@media print{
-    body{background:white;color:black;}
-    #loginBox,
-    button,
-    input,
-    select{
-        display:none !important;
-    }
-}
 </style>
-
 </head>
 
 <body>
 
-<!-- LOGIN -->
-<div id="loginBox">
-    <div class="loginCard">
-        <h3>Login</h3>
-        <input type="password" id="pass" placeholder="Password">
-        <button onclick="login()">Login</button>
-        <button onclick="changePassword()">Change Password</button>
-    </div>
-</div>
-
 <div class="container">
 <div class="card">
 
-<!-- HEADER -->
-<div style="text-align:center;margin-bottom:10px;">
-    <h2>🚗 شركة تل الوديان للتجارة - +966539115111</h2>
-    <p>Car Transfer System Pro</p>
-</div>
+<h2 style="text-align:center;">🚗 Tal Al Wedyan Car System</h2>
 
 <!-- FORM -->
-<input type="text" id="car" placeholder="Car Name / اسم السيارة">
-<input type="text" id="plate" placeholder="Car Number Plate / رقم اللوحة">
-<input type="text" id="customer" placeholder="Customer Name / اسم العميل">
-<input type="text" id="phone" placeholder="Phone Number / رقم الهاتف">
-<input type="number" id="fee" placeholder="Transfer Fee / رسوم النقل">
-<input type="text" id="reason" placeholder="Reason / سبب النقل">
+<input type="text" id="car" placeholder="Car Name">
+<input type="text" id="plate" placeholder="Plate Number">
+<input type="text" id="customer" placeholder="Customer Name">
+<input type="text" id="phone" placeholder="Phone">
+<input type="number" id="fee" placeholder="Fee">
+<input type="text" id="reason" placeholder="Reason">
 
 <select id="status">
-    <option value="Completed">Completed / تم النقل</option>
-    <option value="Pending">Pending / لم يتم النقل</option>
+    <option value="Completed">Completed</option>
+    <option value="Pending">Pending</option>
 </select>
 
 <input type="file" id="file">
 
 <button onclick="addData()">Add Record</button>
-<button onclick="saveData()">Save Record</button>
 <button onclick="window.print()">Print All</button>
 
 <table>
@@ -134,7 +91,7 @@ img{
 <th>Fee</th>
 <th>Status</th>
 <th>Reason</th>
-<th>File</th>
+<th>Image</th>
 <th>Action</th>
 </tr>
 </thead>
@@ -148,36 +105,8 @@ img{
 <script>
 
 let data = JSON.parse(localStorage.getItem("cars")) || [];
-let password = localStorage.getItem("pass") || "1234";
 
-/* LOGIN */
-function login(){
-    let p = document.getElementById("pass").value;
-
-    if(p === password){
-        document.getElementById("loginBox").style.display="none";
-    }else{
-        alert("Wrong Password");
-    }
-}
-
-/* CHANGE PASSWORD */
-function changePassword(){
-    let old = prompt("Old Password?");
-    if(old !== password){
-        alert("Wrong Password");
-        return;
-    }
-
-    let np = prompt("New Password?");
-    if(np){
-        password = np;
-        localStorage.setItem("pass", np);
-        alert("Password Changed ✔");
-    }
-}
-
-/* ADD DATA (IMAGE FIXED) */
+/* ADD DATA */
 function addData(){
 
     let car = document.getElementById("car").value;
@@ -212,8 +141,8 @@ function addData(){
                 file: e.target.result
             });
 
+            save();
             render();
-            saveData();
         };
 
         reader.readAsDataURL(file);
@@ -230,8 +159,8 @@ function addData(){
             file: null
         });
 
+        save();
         render();
-        saveData();
     }
 
     document.getElementById("car").value="";
@@ -244,70 +173,15 @@ function addData(){
 }
 
 /* SAVE */
-function saveData(){
+function save(){
     localStorage.setItem("cars", JSON.stringify(data));
 }
 
 /* DELETE */
-function deleteData(id){
+function del(id){
     data = data.filter(x => x.id !== id);
+    save();
     render();
-    saveData();
-}
-
-/* EDIT */
-function editData(id){
-    let item = data.find(x => x.id === id);
-
-    document.getElementById("car").value = item.car;
-    document.getElementById("plate").value = item.plate;
-    document.getElementById("customer").value = item.customer;
-    document.getElementById("phone").value = item.phone;
-    document.getElementById("fee").value = item.fee;
-    document.getElementById("reason").value = item.reason;
-
-    data = data.filter(x => x.id !== id);
-    render();
-    saveData();
-}
-
-/* PRINT SINGLE */
-function printSingle(id){
-
-    let item = data.find(x => x.id === id);
-
-    let w = window.open("", "", "width=800,height=600");
-
-    w.document.write(`
-        <html>
-        <head>
-        <title>Print</title>
-        <style>
-            body{font-family:Arial;padding:20px;}
-            img{max-width:200px;}
-        </style>
-        </head>
-        <body>
-
-        <h2>Car Transfer Invoice</h2>
-
-        <p><b>Car:</b> ${item.car}</p>
-        <p><b>Plate:</b> ${item.plate}</p>
-        <p><b>Customer:</b> ${item.customer}</p>
-        <p><b>Phone:</b> ${item.phone}</p>
-        <p><b>Fee:</b> ${item.fee}</p>
-        <p><b>Status:</b> ${item.status}</p>
-        <p><b>Reason:</b> ${item.reason || "-"}</p>
-
-        ${item.file ? `<img src="${item.file}">` : ""}
-
-        <script>window.print();</script>
-
-        </body>
-        </html>
-    `);
-
-    w.document.close();
 }
 
 /* RENDER */
@@ -325,15 +199,9 @@ function render(){
             <td>${item.phone}</td>
             <td>${item.fee}</td>
             <td>${item.status}</td>
-            <td>${item.reason || "-"}</td>
-
+            <td>${item.reason}</td>
             <td>${item.file ? `<img src="${item.file}">` : "-"}</td>
-
-            <td>
-                <button onclick="editData(${item.id})">Edit</button>
-                <button onclick="deleteData(${item.id})">Delete</button>
-                <button onclick="printSingle(${item.id})">Print</button>
-            </td>
+            <td><button onclick="del(${item.id})">Delete</button></td>
         </tr>
         `;
     });
