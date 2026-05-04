@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Car Transfer System Pro</title>
+
+<style>
+body{
+    font-family:Arial;
+    margin:0;
+    padding:20px;
+    background:#0f172a;
+    color:white;
+}
+
+/* LOGIN */
+#loginBox{
+    position:fixed;
+    inset:0;
+    background:#000000ee;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.loginCard{
+    background:#111827;
+    padding:20px;
+    border-radius:10px;
+    width:300px;
+}
+
+/* MAIN */
+.container{max-width:1000px;margin:auto;}
+.card{background:#111827;padding:20px;border-radius:12px;}
+
+input, select{
+    width:100%;
+    padding:10px;
+    margin:5px 0;
+    border-radius:8px;
+    border:none;
+}
+
+button{
+    padding:10px;
+    background:#38bdf8;
+    border:none;
+    border-radius:8px;
+    font-weight:bold;
+    cursor:pointer;
+    margin:5px;
+}
+
+table{
+    width:100%;
+    margin-top:20px;
+    border-collapse:collapse;
+}
+
+th, td{
+    border:1px solid #333;
+    padding:10px;
+    text-align:center;
+}
+
+th{
+    background:#1f2937;
+}
+
+/* PRINT CLEAN */
+@media print{
+    body{background:white;color:black;}
+    #loginBox, button, input, select{display:none;}
+    .card{background:white;color:black;}
+}
+</style>
+
+</head>
+
+<body>
+
+<!-- 🔐 LOGIN -->
+<div id="loginBox">
+    <div class="loginCard">
+        <h3>Login</h3>
+        <p>Hint: Password 1234</p>
+        <input type="password" id="pass">
+        <button onclick="login()">Login</button>
+    </div>
+</div>
+
+<div class="container">
+
+<div class="card">
+
+<!-- 🏢 HEADER -->
+<div style="text-align:center;margin-bottom:10px;">
+    <h2>🚗 +966539115111 - شركة تل الوديان للتجارة</h2>
+    <p>Car Transfer System Pro</p>
+</div>
+
+<!-- FORM -->
+<input type="text" id="car" placeholder="Car Name / اسم السيارة">
+<input type="text" id="plate" placeholder="Car Number Plate / رقم اللوحة">
+<input type="text" id="customer" placeholder="Customer Name / اسم العميل">
+<input type="text" id="phone" placeholder="Phone Number / رقم الهاتف">
+<input type="number" id="fee" placeholder="Transfer Fee / رسوم النقل">
+<input type="text" id="reason" placeholder="Reason / سبب النقل">
+
+<select id="status">
+    <option value="Completed">Completed / تم النقل</option>
+    <option value="Pending">Pending / لم يتم النقل</option>
+</select>
+
+<input type="file" id="file">
+
+<button onclick="addData()">Add Record</button>
+<button onclick="saveData()">Save Record</button>
+<button onclick="window.print()">Print / طباعة</button>
+
+<table>
+<thead>
+<tr>
+<th>Car</th>
+<th>Plate</th>
+<th>Customer</th>
+<th>Phone</th>
+<th>Fee</th>
+<th>Status</th>
+<th>Reason</th>
+<th>File</th>
+</tr>
+</thead>
+
+<tbody id="tableData"></tbody>
+</table>
+
+</div>
+</div>
+
+<script>
+
+let data = JSON.parse(localStorage.getItem("cars")) || [];
+let password = localStorage.getItem("pass") || "1234";
+
+/* LOGIN */
+function login(){
+    let p = document.getElementById("pass").value;
+
+    if(p === password){
+        document.getElementById("loginBox").style.display="none";
+    }else{
+        alert("Wrong Password");
+    }
+}
+
+/* ADD DATA */
+function addData(){
+
+    let car = document.getElementById("car").value;
+    let plate = document.getElementById("plate").value;
+    let customer = document.getElementById("customer").value;
+    let phone = document.getElementById("phone").value;
+    let fee = document.getElementById("fee").value;
+    let status = document.getElementById("status").value;
+    let reason = document.getElementById("reason").value;
+
+    let fileInput = document.getElementById("file");
+    let fileName = fileInput.files.length > 0 ? fileInput.files[0].name : "";
+
+    if(car=="" || plate=="" || customer=="" || phone=="" || fee==""){
+        alert("Fill all fields");
+        return;
+    }
+
+    data.push({
+        car,
+        plate,
+        customer,
+        phone,
+        fee,
+        status,
+        reason,
+        file:fileName
+    });
+
+    render();
+
+    document.getElementById("car").value="";
+    document.getElementById("plate").value="";
+    document.getElementById("customer").value="";
+    document.getElementById("phone").value="";
+    document.getElementById("fee").value="";
+    document.getElementById("reason").value="";
+    document.getElementById("file").value="";
+}
+
+/* 💾 SAVE RECORD */
+function saveData(){
+    localStorage.setItem("cars", JSON.stringify(data));
+    alert("Records Saved Successfully ✔");
+}
+
+/* RENDER */
+function render(){
+
+    let table = document.getElementById("tableData");
+    table.innerHTML="";
+
+    data.forEach(item=>{
+        table.innerHTML += `
+        <tr>
+            <td>${item.car}</td>
+            <td>${item.plate}</td>
+            <td>${item.customer}</td>
+            <td>${item.phone}</td>
+            <td>${item.fee}</td>
+            <td>${item.status}</td>
+            <td>${item.reason || "-"}</td>
+            <td>${item.file ? "📎 " + item.file : "-"}</td>
+        </tr>
+        `;
+    });
+}
+
+render();
+
+</script>
+
+</body>
+</html>
