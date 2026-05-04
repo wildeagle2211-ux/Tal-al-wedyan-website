@@ -1,275 +1,149 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<title>شركة تل الوديان للتجارة</title>
+<title>Tel Al Wadiyan - Brand & Cars</title>
 
 <style>
 body{
     margin:0;
     font-family:Arial;
+    color:white;
+}
+
+/* HERO BACKGROUND */
+.hero{
+    width:100%;
+    height:450px;
+    background:url('banner.jpg') center/cover no-repeat;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+}
+
+/* DARK OVERLAY */
+.hero::after{
+    content:"";
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.6);
+}
+
+.hero h1{
+    position:relative;
+    z-index:2;
+    font-size:32px;
+    text-align:center;
+}
+
+/* CONTAINER */
+.container{
+    padding:30px;
     background:#0f172a;
 }
 
-/* HEADER */
-header{
+.card{
     background:#111827;
-    color:white;
-    padding:15px;
-    text-align:center;
-}
-
-/* LAYOUT */
-.main{
-    display:flex;
-    gap:20px;
     padding:20px;
+    border-radius:12px;
+    margin-bottom:20px;
 }
 
-/* LEFT PANEL */
-.form-box{
-    width:35%;
-    background:white;
-    padding:15px;
-    border-radius:10px;
-}
-
-/* RIGHT PANEL */
-.data-box{
-    width:65%;
-    background:white;
-    padding:15px;
-    border-radius:10px;
-}
-
-/* INPUT */
-input,select{
-    width:100%;
-    padding:8px;
-    margin:5px 0;
-}
-
-/* BUTTON */
-button{
-    padding:8px 12px;
+input{
+    padding:10px;
     margin:5px;
-    background:#2563eb;
-    color:white;
+    border-radius:8px;
     border:none;
-    border-radius:6px;
+}
+
+button{
+    padding:10px;
+    background:#38bdf8;
+    border:none;
+    color:black;
+    font-weight:bold;
+    border-radius:8px;
     cursor:pointer;
 }
 
-/* TABLE */
-table{
-    width:100%;
-    border-collapse:collapse;
+ul{
+    margin-top:15px;
 }
 
-th,td{
-    border:1px solid #ddd;
-    padding:8px;
-    text-align:center;
-}
-
-th{
-    background:#1e3a8a;
-    color:white;
-}
-
-img{
-    width:60px;
-}
-
-/* MSG */
-#msg{
-    color:green;
-    font-weight:bold;
+/* PRINT */
+@media print {
+    .hero, button, input{
+        display:none;
+    }
+    body{
+        background:white;
+        color:black;
+    }
 }
 </style>
+
 </head>
 
 <body>
 
-<header>
-<h2>شركة تل الوديان للتجارة</h2>
-<p>Vehicle Management System</p>
-</header>
-
-<div class="main">
-
-<!-- FORM -->
-<div class="form-box">
-
-<h3>Admin Panel</h3>
-
-<p id="msg"></p>
-
-<input id="carName" placeholder="Car Name">
-<input id="plate" placeholder="Plate Number">
-<input id="model" placeholder="Model">
-<input id="customer" placeholder="Customer Name">
-<input id="phone" placeholder="Phone Number">
-<input id="price" placeholder="Price with VAT">
-<input id="fee" placeholder="Transfer Fee">
-
-<select id="transfer">
-<option>Yes</option>
-<option>No</option>
-</select>
-
-<input id="reason" placeholder="Reason">
-
-<input type="file" id="img">
-
-<button onclick="save()">Save Car</button>
-
+<!-- HERO SECTION -->
+<div class="hero">
+    <h1>Tel Al Wadiyan Trading Company</h1>
 </div>
 
-<!-- DATA -->
-<div class="data-box">
+<div class="container">
 
-<h3>Records</h3>
+<!-- LOGO / BRAND -->
+<div class="card">
+<h2>🏢 Brand Identity</h2>
 
-<input id="search" placeholder="Search..." onkeyup="searchData()">
+<svg width="120" height="120" viewBox="0 0 320 320">
+  <circle cx="160" cy="160" r="150" fill="#0f172a"/>
+  <path d="M110 260 L160 60 L210 260" stroke="#38bdf8" stroke-width="10" fill="none"/>
+</svg>
 
-<table>
-<thead>
-<tr>
-<th>Invoice</th>
-<th>Car</th>
-<th>Plate</th>
-<th>Customer</th>
-<th>Image</th>
-<th>Action</th>
-</tr>
-</thead>
+<p>Luxury • Trust • Innovation</p>
+</div>
 
-<tbody id="tableData"></tbody>
+<!-- CAR SYSTEM -->
+<div class="card">
+<h2>🚗 Add Cars</h2>
 
-</table>
+<input type="text" id="carName" placeholder="Car Name">
+<input type="text" id="carModel" placeholder="Model">
 
+<br><br>
+
+<button onclick="addCar()">Save Car</button>
+<button onclick="window.print()">Print</button>
+
+<ul id="carList"></ul>
 </div>
 
 </div>
 
 <script>
+function addCar(){
+    let name = document.getElementById("carName").value;
+    let model = document.getElementById("carModel").value;
 
-let cars=JSON.parse(localStorage.getItem("cars"))||[];
-let editIndex=-1;
-let inv=cars.length+1;
+    if(name === "" || model === ""){
+        alert("Please enter car details");
+        return;
+    }
 
-/* SAVE */
-function save(){
+    let li = document.createElement("li");
+    li.textContent = name + " - " + model;
 
-let reader=new FileReader();
-let file=img.files[0];
+    document.getElementById("carList").appendChild(li);
 
-reader.onload=function(){
-
-let data={
-invoice:"INV-"+inv++,
-car:carName.value,
-plate:plate.value,
-customer:customer.value,
-img:reader.result
-};
-
-if(editIndex===-1){
-cars.push(data);
-}else{
-cars[editIndex]=data;
-editIndex=-1;
+    document.getElementById("carName").value = "";
+    document.getElementById("carModel").value = "";
 }
-
-localStorage.setItem("cars",JSON.stringify(cars));
-msg.innerText="✔ Saved Successfully";
-render();
-clearForm();
-
-};
-
-if(file) reader.readAsDataURL(file);
-else reader.onload();
-
-}
-
-/* RENDER */
-function render(){
-
-let html="";
-
-cars.forEach((c,i)=>{
-
-html+=`
-<tr>
-<td>${c.invoice}</td>
-<td>${c.car}</td>
-<td>${c.plate}</td>
-<td>${c.customer}</td>
-<td>${c.img?`<img src="${c.img}">`:""}</td>
-<td>
-<button onclick="edit(${i})">Edit</button>
-<button onclick="del(${i})">Delete</button>
-</td>
-</tr>
-`;
-
-});
-
-tableData.innerHTML=html;
-
-}
-
-/* DELETE */
-function del(i){
-cars.splice(i,1);
-localStorage.setItem("cars",JSON.stringify(cars));
-render();
-}
-
-/* EDIT */
-function edit(i){
-
-let c=cars[i];
-
-carName.value=c.car;
-plate.value=c.plate;
-customer.value=c.customer;
-
-editIndex=i;
-
-}
-
-/* SEARCH */
-function searchData(){
-
-let val=search.value.toLowerCase();
-
-let filtered=cars.filter(c =>
-c.invoice.toLowerCase().includes(val) ||
-c.plate.toLowerCase().includes(val) ||
-c.customer.toLowerCase().includes(val)
-);
-
-let html="";
-
-filtered.forEach(c=>{
-html+=`<tr><td>${c.invoice}</td><td>${c.car}</td><td>${c.plate}</td><td>${c.customer}</td></tr>`;
-});
-
-tableData.innerHTML=html;
-
-}
-
-/* CLEAR */
-function clearForm(){
-document.querySelectorAll(".form-box input").forEach(i=>i.value="");
-}
-
-/* INIT */
-render();
-
 </script>
 
 </body>
