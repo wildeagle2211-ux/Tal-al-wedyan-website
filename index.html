@@ -4,10 +4,6 @@
 <meta charset="UTF-8">
 <title>Car Transfer System Pro</title>
 
-<!-- PDF LIBRARIES -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
 <style>
 body{
     font-family:Arial;
@@ -15,26 +11,19 @@ body{
     padding:20px;
     background:#0f172a;
     color:white;
+    transition:0.3s;
 }
 
-#loginBox{
-    position:fixed;
-    inset:0;
-    background:#000000ee;
-    display:flex;
-    justify-content:center;
-    align-items:center;
+.container{
+    max-width:1000px;
+    margin:auto;
 }
 
-.loginCard{
+.card{
     background:#111827;
     padding:20px;
-    border-radius:10px;
-    width:300px;
+    border-radius:12px;
 }
-
-.container{max-width:1000px;margin:auto;}
-.card{background:#111827;padding:20px;border-radius:12px;}
 
 input, select{
     width:100%;
@@ -54,18 +43,13 @@ button{
     margin:5px;
 }
 
-.dashboard{
-    display:flex;
-    justify-content:space-between;
-    background:#1f2937;
-    padding:10px;
-    border-radius:10px;
-    margin-bottom:10px;
+.lang{
+    background:#22c55e;
 }
 
 table{
     width:100%;
-    margin-top:15px;
+    margin-top:20px;
     border-collapse:collapse;
 }
 
@@ -75,15 +59,18 @@ th, td{
     text-align:center;
 }
 
-th{background:#1f2937;}
+th{
+    background:#1f2937;
+}
 
-.tabs button{background:#1f2937;}
-.active{background:#38bdf8 !important;}
+/* RTL SUPPORT */
+.rtl{
+    direction:rtl;
+    text-align:right;
+}
 
-@media print{
-    body{background:white;color:black;}
-    button, #loginBox, .tabs{display:none !important;}
-    .card{background:white;color:black;}
+.rtl input, .rtl select{
+    text-align:right;
 }
 </style>
 
@@ -91,113 +78,54 @@ th{background:#1f2937;}
 
 <body>
 
-<!-- LOGIN -->
-<div id="loginBox">
-    <div class="loginCard">
-        <h3>🔐 Login</h3>
-        <p>Hint: Default password 1234</p>
-        <input type="password" id="pass" placeholder="Enter Password">
-        <button onclick="login()">Login</button>
-    </div>
-</div>
-
 <div class="container">
 
 <div class="card">
 
-<h2>🚗 Car Transfer System Pro</h2>
+<h2 id="title">🚗 Car Transfer System Pro</h2>
 
-<button onclick="changePassword()">Change Password</button>
-<button onclick="window.print()">Print Invoice</button>
-<button onclick="downloadPDF()">Download PDF</button>
+<button class="lang" onclick="setLang('en')">English</button>
+<button class="lang" onclick="setLang('ar')">العربية</button>
 
-<!-- DASHBOARD -->
-<div class="dashboard">
-    <div>Total Records: <span id="total">0</span></div>
-    <div>Total Earnings: <span id="earnings">0</span> SAR</div>
-</div>
-
-<!-- TABS -->
-<div class="tabs">
-    <button onclick="setTab('all')" class="active">All</button>
-    <button onclick="setTab('Completed')">Transferred Done</button>
-    <button onclick="setTab('Pending')">Pending</button>
-</div>
-
-<!-- FORM -->
-<input type="text" id="car" placeholder="Car Name">
-<input type="text" id="customer" placeholder="Customer Name">
-<input type="text" id="phone" placeholder="Phone Number">
-<input type="number" id="fee" placeholder="Transfer Fee">
+<input type="text" id="car" placeholder="Car Name / اسم السيارة">
+<input type="text" id="customer" placeholder="Customer Name / اسم العميل">
+<input type="text" id="phone" placeholder="Phone Number / رقم الهاتف">
+<input type="number" id="fee" placeholder="Transfer Fee / رسوم النقل">
 
 <select id="status">
-    <option value="Completed">Completed</option>
-    <option value="Pending">Pending</option>
+    <option value="Completed">Completed / تم النقل</option>
+    <option value="Pending">Pending / لم يتم النقل</option>
 </select>
 
-<button onclick="addData()">Add Record</button>
+<input type="file" id="file">
 
-<!-- INVOICE AREA -->
-<div id="invoiceArea">
+<button onclick="addData()">Add Record</button>
+<button onclick="window.print()">Print / طباعة</button>
 
 <table>
 <thead>
 <tr>
-<th>#</th>
-<th>Car</th>
-<th>Customer</th>
-<th>Phone</th>
-<th>Fee</th>
-<th>Status</th>
+<th>Car / سيارة</th>
+<th>Customer / عميل</th>
+<th>Phone / هاتف</th>
+<th>Fee / رسوم</th>
+<th>Status / حالة</th>
+<th>File / ملف</th>
 </tr>
 </thead>
 
 <tbody id="tableData"></tbody>
+
 </table>
 
 </div>
 
 </div>
-</div>
 
 <script>
 
 let data = JSON.parse(localStorage.getItem("cars")) || [];
-let password = localStorage.getItem("pass") || "1234";
-let tab = "all";
-
-// LOGIN
-function login(){
-    let p = document.getElementById("pass").value;
-    if(p === password){
-        document.getElementById("loginBox").style.display="none";
-    }else{
-        alert("Wrong Password");
-    }
-}
-
-// CHANGE PASSWORD
-function changePassword(){
-    let old = prompt("Enter old password");
-    if(old === password){
-        let newp = prompt("Enter new password");
-        if(newp){
-            password = newp;
-            localStorage.setItem("pass",newp);
-            alert("Password Updated");
-        }
-    }else{
-        alert("Wrong Password");
-    }
-}
-
-// TAB
-function setTab(t){
-    tab = t;
-    document.querySelectorAll(".tabs button").forEach(b=>b.classList.remove("active"));
-    event.target.classList.add("active");
-    render();
-}
+render();
 
 // ADD DATA
 function addData(){
@@ -208,15 +136,24 @@ function addData(){
     let fee = document.getElementById("fee").value;
     let status = document.getElementById("status").value;
 
-    if(!car||!customer||!phone||!fee){
+    let fileInput = document.getElementById("file");
+    let fileName = fileInput.files.length > 0 ? fileInput.files[0].name : "";
+
+    if(car=="" || customer=="" || phone=="" || fee==""){
         alert("Fill all fields");
         return;
     }
 
-    let invoice = data.length ? Math.max(...data.map(d=>d.invoice))+1 : 1;
+    data.push({
+        car,
+        customer,
+        phone,
+        fee,
+        status,
+        file:fileName
+    });
 
-    data.push({invoice,car,customer,phone,fee,status});
-    localStorage.setItem("cars",JSON.stringify(data));
+    localStorage.setItem("cars", JSON.stringify(data));
 
     render();
 
@@ -224,63 +161,39 @@ function addData(){
     document.getElementById("customer").value="";
     document.getElementById("phone").value="";
     document.getElementById("fee").value="";
+    document.getElementById("file").value="";
 }
 
 // RENDER
 function render(){
-
     let table = document.getElementById("tableData");
     table.innerHTML="";
 
-    let filtered = data;
-
-    if(tab!=="all"){
-        filtered = data.filter(i=>i.status===tab);
-    }
-
-    let total = filtered.length;
-    let earnings = 0;
-
-    filtered.forEach(item=>{
-        if(item.status==="Completed"){
-            earnings += Number(item.fee);
-        }
-
+    data.forEach(item=>{
         table.innerHTML += `
         <tr>
-            <td>${item.invoice}</td>
             <td>${item.car}</td>
             <td>${item.customer}</td>
             <td>${item.phone}</td>
             <td>${item.fee}</td>
             <td>${item.status}</td>
-        </tr>`;
-    });
-
-    document.getElementById("total").innerText = total;
-    document.getElementById("earnings").innerText = earnings;
-}
-
-// PDF EXPORT
-function downloadPDF(){
-
-    const { jsPDF } = window.jspdf;
-
-    html2canvas(document.getElementById("invoiceArea")).then(canvas=>{
-
-        let img = canvas.toDataURL("image/png");
-
-        let pdf = new jsPDF("p","mm","a4");
-
-        let w = 190;
-        let h = canvas.height * w / canvas.width;
-
-        pdf.addImage(img,"PNG",10,10,w,h);
-        pdf.save("Car_Transfer_Invoice.pdf");
+            <td>${item.file || "-"}</td>
+        </tr>
+        `;
     });
 }
 
-render();
+// LANGUAGE SWITCH
+function setLang(lang){
+
+    if(lang === "ar"){
+        document.body.classList.add("rtl");
+        document.getElementById("title").innerText = "🚗 نظام نقل السيارات الاحترافي";
+    }else{
+        document.body.classList.remove("rtl");
+        document.getElementById("title").innerText = "🚗 Car Transfer System Pro";
+    }
+}
 
 </script>
 
