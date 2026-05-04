@@ -2,54 +2,75 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Brand Kit - Tel Al Wadiyan</title>
+<title>Car Transfer System Pro</title>
 
 <style>
 body{
-    margin:0;
     font-family:Arial;
+    margin:0;
+    padding:20px;
     background:#0f172a;
     color:white;
+    transition:0.3s;
 }
 
 .container{
-    padding:30px;
+    max-width:1000px;
+    margin:auto;
 }
 
 .card{
     background:#111827;
     padding:20px;
     border-radius:12px;
-    margin-bottom:20px;
 }
 
-.logo-box{
-    text-align:center;
+input, select{
+    width:100%;
+    padding:10px;
+    margin:5px 0;
+    border-radius:8px;
+    border:none;
 }
-
-.color-box{
-    display:flex;
-    gap:10px;
-}
-
-.color{
-    width:100px;
-    height:100px;
-    border-radius:10px;
-}
-
-.blue{background:#38bdf8;}
-.dark{background:#0f172a;}
-.gray{background:#1f2937;}
-.white{background:#ffffff;}
 
 button{
     padding:10px;
     background:#38bdf8;
     border:none;
-    color:black;
-    font-weight:bold;
     border-radius:8px;
+    font-weight:bold;
+    cursor:pointer;
+    margin:5px;
+}
+
+.lang{
+    background:#22c55e;
+}
+
+table{
+    width:100%;
+    margin-top:20px;
+    border-collapse:collapse;
+}
+
+th, td{
+    border:1px solid #333;
+    padding:10px;
+    text-align:center;
+}
+
+th{
+    background:#1f2937;
+}
+
+/* RTL SUPPORT */
+.rtl{
+    direction:rtl;
+    text-align:right;
+}
+
+.rtl input, .rtl select{
+    text-align:right;
 }
 </style>
 
@@ -59,75 +80,122 @@ button{
 
 <div class="container">
 
-<!-- LOGO -->
-<div class="card logo-box">
-
-<h2>🏢 Company Logo</h2>
-
-<!-- SVG LOGO -->
-<svg width="220" height="220" viewBox="0 0 320 320">
-  <circle cx="160" cy="160" r="150" fill="#0f172a"/>
-  <path d="M110 260 L160 60 L210 260" stroke="#38bdf8" stroke-width="10" fill="none"/>
-  <rect x="125" y="140" width="70" height="30" rx="8" fill="#ffffff"/>
-  <circle cx="140" cy="175" r="10" fill="#38bdf8"/>
-  <circle cx="180" cy="175" r="10" fill="#38bdf8"/>
-</svg>
-
-<h3>شركة تل الوديان للتجارة</h3>
-
-</div>
-
-<!-- COLORS -->
 <div class="card">
 
-<h2>🎨 Brand Colors</h2>
+<h2 id="title">🚗 Car Transfer System Pro</h2>
 
-<div class="color-box">
-<div class="color blue"></div>
-<div class="color dark"></div>
-<div class="color gray"></div>
-<div class="color white"></div>
-</div>
+<button class="lang" onclick="setLang('en')">English</button>
+<button class="lang" onclick="setLang('ar')">العربية</button>
 
-<p>
-Primary: #38bdf8 (Sky Blue)<br>
-Dark: #0f172a (Deep Navy)<br>
-Accent: White / Gray
-</p>
+<input type="text" id="car" placeholder="Car Name / اسم السيارة">
+<input type="text" id="customer" placeholder="Customer Name / اسم العميل">
+<input type="text" id="phone" placeholder="Phone Number / رقم الهاتف">
+<input type="number" id="fee" placeholder="Transfer Fee / رسوم النقل">
 
-</div>
+<select id="status">
+    <option value="Completed">Completed / تم النقل</option>
+    <option value="Pending">Pending / لم يتم النقل</option>
+</select>
 
-<!-- TYPOGRAPHY -->
-<div class="card">
+<input type="file" id="file">
 
-<h2>🔤 Typography</h2>
+<button onclick="addData()">Add Record</button>
+<button onclick="window.print()">Print / طباعة</button>
 
-<p>Font: Arial / Sans-serif</p>
-<p>Style: Bold for Titles, Light for details</p>
+<table>
+<thead>
+<tr>
+<th>Car / سيارة</th>
+<th>Customer / عميل</th>
+<th>Phone / هاتف</th>
+<th>Fee / رسوم</th>
+<th>Status / حالة</th>
+<th>File / ملف</th>
+</tr>
+</thead>
 
-</div>
+<tbody id="tableData"></tbody>
 
-<!-- BRAND MESSAGE -->
-<div class="card">
-
-<h2>🚀 Brand Identity</h2>
-
-<p>
-We are a premium vehicle management company focused on:
-</p>
-
-<ul>
-<li>Speed ⚡</li>
-<li>Trust 🔐</li>
-<li>Innovation 🚀</li>
-<li>Luxury Cars 🚗</li>
-</ul>
-
-<button>Download Brand Kit</button>
+</table>
 
 </div>
 
 </div>
+
+<script>
+
+let data = JSON.parse(localStorage.getItem("cars")) || [];
+render();
+
+// ADD DATA
+function addData(){
+
+    let car = document.getElementById("car").value;
+    let customer = document.getElementById("customer").value;
+    let phone = document.getElementById("phone").value;
+    let fee = document.getElementById("fee").value;
+    let status = document.getElementById("status").value;
+
+    let fileInput = document.getElementById("file");
+    let fileName = fileInput.files.length > 0 ? fileInput.files[0].name : "";
+
+    if(car=="" || customer=="" || phone=="" || fee==""){
+        alert("Fill all fields");
+        return;
+    }
+
+    data.push({
+        car,
+        customer,
+        phone,
+        fee,
+        status,
+        file:fileName
+    });
+
+    localStorage.setItem("cars", JSON.stringify(data));
+
+    render();
+
+    document.getElementById("car").value="";
+    document.getElementById("customer").value="";
+    document.getElementById("phone").value="";
+    document.getElementById("fee").value="";
+    document.getElementById("file").value="";
+}
+
+// RENDER
+function render(){
+    let table = document.getElementById("tableData");
+    table.innerHTML="";
+
+    data.forEach(item=>{
+        table.innerHTML += `
+        <tr>
+            <td>${item.car}</td>
+            <td>${item.customer}</td>
+            <td>${item.phone}</td>
+            <td>${item.fee}</td>
+            <td>${item.status}</td>
+            <td>${item.file || "-"}</td>
+        </tr>
+        `;
+    });
+}
+
+// LANGUAGE SWITCH
+function setLang(lang){
+
+    if(lang === "ar"){
+        document.body.classList.add("rtl");
+        document.getElementById("title").innerText = "🚗 نظام نقل السيارات الاحترافي";
+    }else{
+        document.body.classList.remove("rtl");
+        document.getElementById("title").innerText = "🚗 Car Transfer System Pro";
+    }
+}
+
+</script>
 
 </body>
 </html>
