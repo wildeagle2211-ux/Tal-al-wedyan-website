@@ -1,88 +1,105 @@
 <!DOCTYPE html>
-<html>
+<html lang="ar">
 <head>
 <meta charset="UTF-8">
-<title>Tel Al Wadiyan - Brand & Cars</title>
+<title>شركة تل الوديان للتجارة</title>
 
 <style>
 body{
     margin:0;
     font-family:Arial;
+    background:#0f172a;
     color:white;
 }
 
-/* HERO BACKGROUND */
-.hero{
-    width:100%;
-    height:450px;
-    background:url('banner.jpg') center/cover no-repeat;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    position:relative;
-}
-
-/* DARK OVERLAY */
-.hero::after{
-    content:"";
-    position:absolute;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    background:rgba(0,0,0,0.6);
-}
-
-.hero h1{
-    position:relative;
-    z-index:2;
-    font-size:32px;
+/* HEADER */
+.header{
     text-align:center;
+    padding:20px;
+    background:#111827;
 }
 
-/* CONTAINER */
+.header h1{
+    margin:0;
+    font-size:26px;
+}
+
+.header p{
+    margin:5px 0 0;
+    color:#38bdf8;
+}
+
+/* CONTACT BAR */
+.contact{
+    text-align:center;
+    background:#38bdf8;
+    color:black;
+    padding:10px;
+    font-weight:bold;
+}
+
+/* MAIN CONTAINER */
 .container{
-    padding:30px;
-    background:#0f172a;
+    max-width:900px;
+    margin:auto;
+    padding:20px;
 }
 
+/* CARD */
 .card{
     background:#111827;
     padding:20px;
     border-radius:12px;
-    margin-bottom:20px;
+    margin-top:20px;
 }
 
-input{
+/* INPUTS */
+input, select{
+    width:100%;
     padding:10px;
-    margin:5px;
-    border-radius:8px;
+    margin:5px 0;
     border:none;
+    border-radius:8px;
 }
 
+/* BUTTONS */
 button{
     padding:10px;
     background:#38bdf8;
     border:none;
-    color:black;
-    font-weight:bold;
     border-radius:8px;
+    font-weight:bold;
     cursor:pointer;
+    margin-top:10px;
+    margin-right:5px;
 }
 
+/* LIST */
 ul{
     margin-top:15px;
 }
 
-/* PRINT */
-@media print {
-    .hero, button, input{
-        display:none;
-    }
-    body{
-        background:white;
-        color:black;
-    }
+/* TABLE */
+table{
+    width:100%;
+    margin-top:20px;
+    border-collapse:collapse;
+}
+
+th, td{
+    border:1px solid #333;
+    padding:10px;
+    text-align:center;
+}
+
+th{
+    background:#1f2937;
+}
+
+/* RTL SUPPORT */
+.rtl{
+    direction:rtl;
+    text-align:right;
 }
 </style>
 
@@ -90,60 +107,114 @@ ul{
 
 <body>
 
-<!-- HERO SECTION -->
-<div class="hero">
-    <h1>Tel Al Wadiyan Trading Company</h1>
+<!-- HEADER -->
+<div class="header">
+    <h1>شركة تل الوديان للتجارة</h1>
+    <p>Tel Al Wadiyan Trading Company</p>
+</div>
+
+<!-- CONTACT -->
+<div class="contact">
+    📞 +966539115111
 </div>
 
 <div class="container">
 
-<!-- LOGO / BRAND -->
+<!-- CAR FORM -->
 <div class="card">
-<h2>🏢 Brand Identity</h2>
 
-<svg width="120" height="120" viewBox="0 0 320 320">
-  <circle cx="160" cy="160" r="150" fill="#0f172a"/>
-  <path d="M110 260 L160 60 L210 260" stroke="#38bdf8" stroke-width="10" fill="none"/>
-</svg>
+<h2>🚗 Car Transfer System</h2>
 
-<p>Luxury • Trust • Innovation</p>
-</div>
+<input type="text" id="car" placeholder="Car Name / اسم السيارة">
+<input type="text" id="customer" placeholder="Customer Name / اسم العميل">
+<input type="text" id="phone" placeholder="Phone Number / رقم الهاتف">
+<input type="number" id="fee" placeholder="Transfer Fee / رسوم النقل">
 
-<!-- CAR SYSTEM -->
-<div class="card">
-<h2>🚗 Add Cars</h2>
+<select id="status">
+    <option value="Completed">Completed / تم النقل</option>
+    <option value="Pending">Pending / لم يتم النقل</option>
+</select>
 
-<input type="text" id="carName" placeholder="Car Name">
-<input type="text" id="carModel" placeholder="Model">
-
-<br><br>
-
-<button onclick="addCar()">Save Car</button>
+<button onclick="addData()">Add Record</button>
 <button onclick="window.print()">Print</button>
 
-<ul id="carList"></ul>
+<table>
+<thead>
+<tr>
+<th>Car</th>
+<th>Customer</th>
+<th>Phone</th>
+<th>Fee</th>
+<th>Status</th>
+</tr>
+</thead>
+
+<tbody id="tableData"></tbody>
+
+</table>
+
 </div>
 
 </div>
 
 <script>
-function addCar(){
-    let name = document.getElementById("carName").value;
-    let model = document.getElementById("carModel").value;
 
-    if(name === "" || model === ""){
-        alert("Please enter car details");
+// DATA STORAGE
+let data = JSON.parse(localStorage.getItem("cars")) || [];
+
+render();
+
+// ADD DATA
+function addData(){
+
+    let car = document.getElementById("car").value;
+    let customer = document.getElementById("customer").value;
+    let phone = document.getElementById("phone").value;
+    let fee = document.getElementById("fee").value;
+    let status = document.getElementById("status").value;
+
+    if(car=="" || customer=="" || phone=="" || fee==""){
+        alert("Please fill all fields");
         return;
     }
 
-    let li = document.createElement("li");
-    li.textContent = name + " - " + model;
+    data.push({
+        car,
+        customer,
+        phone,
+        fee,
+        status
+    });
 
-    document.getElementById("carList").appendChild(li);
+    localStorage.setItem("cars", JSON.stringify(data));
 
-    document.getElementById("carName").value = "";
-    document.getElementById("carModel").value = "";
+    render();
+
+    document.getElementById("car").value="";
+    document.getElementById("customer").value="";
+    document.getElementById("phone").value="";
+    document.getElementById("fee").value="";
 }
+
+// RENDER TABLE
+function render(){
+
+    let table = document.getElementById("tableData");
+    table.innerHTML="";
+
+    data.forEach(item=>{
+        table.innerHTML += `
+        <tr>
+            <td>${item.car}</td>
+            <td>${item.customer}</td>
+            <td>${item.phone}</td>
+            <td>${item.fee}</td>
+            <td>${item.status}</td>
+        </tr>
+        `;
+    });
+}
+
 </script>
 
 </body>
