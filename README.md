@@ -1,99 +1,133 @@
-# 🚗✨ شركة تل الوديان للتجارة  
-## Tal Al Wadyan Trading – Vehicle Management System
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Brand Kit - Tel Al Wadiyan</title>
 
-> A modern, powerful and lightweight **web-based vehicle trading system** built using HTML, CSS and JavaScript.
+<style>
+body{
+    margin:0;
+    font-family:Arial;
+    background:#0f172a;
+    color:white;
+}
 
----
+.container{
+    padding:30px;
+}
 
-## 🌐 Live Website
-🔗 https://wildeagle2211-ux.github.io/Tal-al-wedyan-website/
+.card{
+    background:#111827;
+    padding:20px;
+    border-radius:12px;
+    margin-bottom:20px;
+}
 
----
+.logo-box{
+    text-align:center;
+}
 
-## 💎 About Company
+.color-box{
+    display:flex;
+    gap:10px;
+}
 
-**شركة تل الوديان للتجارة** is a professional vehicle trading platform designed to manage cars, customers, and transactions in a simple and efficient way.
+.color{
+    width:100px;
+    height:100px;
+    border-radius:10px;
+}
 
-We focus on:
-- Fast vehicle management
-- Clean record keeping
-- Professional trading system
+.blue{background:#38bdf8;}
+.dark{background:#0f172a;}
+.gray{background:#1f2937;}
+.white{background:#ffffff;}
 
----
+button{
+    padding:10px;
+    background:#38bdf8;
+    border:none;
+    color:black;
+    font-weight:bold;
+    border-radius:8px;
+}
+</style>
 
-## 🚗 System Features
+</head>
 
-✔ Secure Login System  
-✔ Add Car Records  
-✔ Edit Car Details  
-✔ Delete Records  
-✔ Print Records  
-✔ Save as PDF  
-✔ Car Transfer Management  
-✔ Transfer Fee Tracking  
-✔ Customer Information System  
-✔ Price Including VAT  
-✔ Arabic + English Interface  
-✔ Password Change Feature  
+<body>
 
----
+<div class="container">
 
-## 🚘 Car Information Fields
+<!-- LOGO -->
+<div class="card logo-box">
 
-Each vehicle record contains:
+<h2>🏢 Company Logo</h2>
 
-- 🚗 Car Name  
-- 🔢 Number Plate  
-- ⚙️ Model  
-- 👤 Customer Name  
-- 📞 Phone Number  
-- 💰 Price (Including VAT)  
-- 💵 Transfer Fee  
-- 🚙 Transfer Status (Yes / No)  
-- ❗ Reason (if Transfer = No)
+<!-- SVG LOGO -->
+<svg width="220" height="220" viewBox="0 0 320 320">
+  <circle cx="160" cy="160" r="150" fill="#0f172a"/>
+  <path d="M110 260 L160 60 L210 260" stroke="#38bdf8" stroke-width="10" fill="none"/>
+  <rect x="125" y="140" width="70" height="30" rx="8" fill="#ffffff"/>
+  <circle cx="140" cy="175" r="10" fill="#38bdf8"/>
+  <circle cx="180" cy="175" r="10" fill="#38bdf8"/>
+</svg>
 
----
+<h3>شركة تل الوديان للتجارة</h3>
 
-## 🔑 Demo Login
+</div>
 
-Username: `admin`  
-Password: `1234`
+<!-- COLORS -->
+<div class="card">
 
----
+<h2>🎨 Brand Colors</h2>
 
-## 🛠️ Technology Stack
+<div class="color-box">
+<div class="color blue"></div>
+<div class="color dark"></div>
+<div class="color gray"></div>
+<div class="color white"></div>
+</div>
 
-- HTML5  
-- CSS3  
-- JavaScript (Vanilla)
+<p>
+Primary: #38bdf8 (Sky Blue)<br>
+Dark: #0f172a (Deep Navy)<br>
+Accent: White / Gray
+</p>
 
----
+</div>
 
-## 📌 Project Purpose
+<!-- TYPOGRAPHY -->
+<div class="card">
 
-This system is built for:
+<h2>🔤 Typography</h2>
 
-- 🚗 Car trading companies  
-- 🏢 Business management systems  
-- 📊 Learning web development  
-- 🧾 Admin dashboard practice  
+<p>Font: Arial / Sans-serif</p>
+<p>Style: Bold for Titles, Light for details</p>
 
----
+</div>
 
-## 🌟 Company Identity
+<!-- BRAND MESSAGE -->
+<div class="card">
 
-### ✨ شركة تل الوديان للتجارة ✨  
-> Professional Vehicle Trading & Management Solutions
+<h2>🚀 Brand Identity</h2>
 
----
+<p>
+We are a premium vehicle management company focused on:
+</p>
 
-## 👨‍💻 Developer Note
+<ul>
+<li>Speed ⚡</li>
+<li>Trust 🔐</li>
+<li>Innovation 🚀</li>
+<li>Luxury Cars 🚗</li>
+</ul>
 
-This project is a lightweight front-end system.  
-All data is stored in browser memory (no database).
+<button>Download Brand Kit</button>
 
----
+</div>
 
-## ⚠️ Important
+</div>
 
-For production use, connect database (Firebase / MySQL) for permanent storage.
+</body>
+</html>
