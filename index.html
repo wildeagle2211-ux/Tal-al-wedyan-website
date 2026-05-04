@@ -1,62 +1,49 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html>
 <head>
 <meta charset="UTF-8">
-<title>شركة تل الوديان للتجارة</title>
+<title>Car Transfer System Pro</title>
+
+<!-- PDF LIBRARIES -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
 body{
-    margin:0;
     font-family:Arial;
+    margin:0;
+    padding:20px;
     background:#0f172a;
     color:white;
 }
 
-/* HEADER */
-.header{
-    text-align:center;
-    padding:20px;
+#loginBox{
+    position:fixed;
+    inset:0;
+    background:#000000ee;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.loginCard{
     background:#111827;
-}
-
-.header p{
-    color:#38bdf8;
-}
-
-/* CONTACT */
-.contact{
-    text-align:center;
-    background:#38bdf8;
-    color:black;
-    padding:10px;
-    font-weight:bold;
-}
-
-/* CONTAINER */
-.container{
-    max-width:1000px;
-    margin:auto;
     padding:20px;
+    border-radius:10px;
+    width:300px;
 }
 
-/* CARD */
-.card{
-    background:#111827;
-    padding:15px;
-    border-radius:12px;
-    margin-top:15px;
-}
+.container{max-width:1000px;margin:auto;}
+.card{background:#111827;padding:20px;border-radius:12px;}
 
-/* INPUTS */
 input, select{
     width:100%;
     padding:10px;
     margin:5px 0;
-    border:none;
     border-radius:8px;
+    border:none;
 }
 
-/* BUTTON */
 button{
     padding:10px;
     background:#38bdf8;
@@ -64,26 +51,39 @@ button{
     border-radius:8px;
     font-weight:bold;
     cursor:pointer;
-    margin:5px 0;
+    margin:5px;
 }
 
-/* RECORD CARD */
-.record{
+.dashboard{
+    display:flex;
+    justify-content:space-between;
     background:#1f2937;
     padding:10px;
-    margin-top:10px;
     border-radius:10px;
+    margin-bottom:10px;
 }
 
-/* RTL */
-.rtl{
-    direction:rtl;
-    text-align:right;
+table{
+    width:100%;
+    margin-top:15px;
+    border-collapse:collapse;
 }
 
-/* SEARCH */
-.searchBox{
-    margin-top:10px;
+th, td{
+    border:1px solid #333;
+    padding:10px;
+    text-align:center;
+}
+
+th{background:#1f2937;}
+
+.tabs button{background:#1f2937;}
+.active{background:#38bdf8 !important;}
+
+@media print{
+    body{background:white;color:black;}
+    button, #loginBox, .tabs{display:none !important;}
+    .card{background:white;color:black;}
 }
 </style>
 
@@ -91,59 +91,113 @@ button{
 
 <body>
 
-<!-- HEADER -->
-<div class="header">
-    <h1>شركة تل الوديان للتجارة</h1>
-    <p>Tel Al Wadiyan Trading Company</p>
-
-    <button onclick="setLang('en')">English</button>
-    <button onclick="setLang('ar')">العربية</button>
-</div>
-
-<!-- CONTACT -->
-<div class="contact">
-📞 +966539115111
+<!-- LOGIN -->
+<div id="loginBox">
+    <div class="loginCard">
+        <h3>🔐 Login</h3>
+        <p>Hint: Default password 1234</p>
+        <input type="password" id="pass" placeholder="Enter Password">
+        <button onclick="login()">Login</button>
+    </div>
 </div>
 
 <div class="container">
 
-<!-- INPUT -->
 <div class="card">
 
-<h2 id="title">🚗 Car Transfer System</h2>
+<h2>🚗 Car Transfer System Pro</h2>
 
-<input id="car" placeholder="Car Number / رقم السيارة (ا ب ت 123)">
-<input id="customer" placeholder="Customer Name / اسم العميل">
-<input id="phone" placeholder="Phone Number / رقم الهاتف">
-<input id="fee" placeholder="Transfer Fee / رسوم النقل">
+<button onclick="changePassword()">Change Password</button>
+<button onclick="window.print()">Print Invoice</button>
+<button onclick="downloadPDF()">Download PDF</button>
+
+<!-- DASHBOARD -->
+<div class="dashboard">
+    <div>Total Records: <span id="total">0</span></div>
+    <div>Total Earnings: <span id="earnings">0</span> SAR</div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+    <button onclick="setTab('all')" class="active">All</button>
+    <button onclick="setTab('Completed')">Transferred Done</button>
+    <button onclick="setTab('Pending')">Pending</button>
+</div>
+
+<!-- FORM -->
+<input type="text" id="car" placeholder="Car Name">
+<input type="text" id="customer" placeholder="Customer Name">
+<input type="text" id="phone" placeholder="Phone Number">
+<input type="number" id="fee" placeholder="Transfer Fee">
 
 <select id="status">
-    <option value="Completed">Completed / تم النقل</option>
-    <option value="Pending">Pending / لم يتم النقل</option>
+    <option value="Completed">Completed</option>
+    <option value="Pending">Pending</option>
 </select>
 
-<input id="reason" placeholder="Reason (if not transferred) / سبب عدم النقل">
+<button onclick="addData()">Add Record</button>
 
-<input type="file" id="file">
+<!-- INVOICE AREA -->
+<div id="invoiceArea">
 
-<button onclick="addData()">Save Record</button>
-<button onclick="window.print()">Print</button>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Car</th>
+<th>Customer</th>
+<th>Phone</th>
+<th>Fee</th>
+<th>Status</th>
+</tr>
+</thead>
 
-<!-- SEARCH BY CAR NUMBER -->
-<input class="searchBox" id="search" placeholder="Search by Car Number / ا ب ت 123" onkeyup="render()">
+<tbody id="tableData"></tbody>
+</table>
 
 </div>
 
-<!-- RECORDS -->
-<div id="list"></div>
-
+</div>
 </div>
 
 <script>
 
 let data = JSON.parse(localStorage.getItem("cars")) || [];
+let password = localStorage.getItem("pass") || "1234";
+let tab = "all";
 
-render();
+// LOGIN
+function login(){
+    let p = document.getElementById("pass").value;
+    if(p === password){
+        document.getElementById("loginBox").style.display="none";
+    }else{
+        alert("Wrong Password");
+    }
+}
+
+// CHANGE PASSWORD
+function changePassword(){
+    let old = prompt("Enter old password");
+    if(old === password){
+        let newp = prompt("Enter new password");
+        if(newp){
+            password = newp;
+            localStorage.setItem("pass",newp);
+            alert("Password Updated");
+        }
+    }else{
+        alert("Wrong Password");
+    }
+}
+
+// TAB
+function setTab(t){
+    tab = t;
+    document.querySelectorAll(".tabs button").forEach(b=>b.classList.remove("active"));
+    event.target.classList.add("active");
+    render();
+}
 
 // ADD DATA
 function addData(){
@@ -153,90 +207,80 @@ function addData(){
     let phone = document.getElementById("phone").value;
     let fee = document.getElementById("fee").value;
     let status = document.getElementById("status").value;
-    let reason = document.getElementById("reason").value;
 
-    let fileInput = document.getElementById("file");
-    let file = fileInput.files.length ? fileInput.files[0].name : "";
-
-    if(car=="" || customer=="" || phone=="" || fee==""){
-        alert("Please fill all required fields");
+    if(!car||!customer||!phone||!fee){
+        alert("Fill all fields");
         return;
     }
 
-    data.push({
-        car,
-        customer,
-        phone,
-        fee,
-        status,
-        reason,
-        file
-    });
+    let invoice = data.length ? Math.max(...data.map(d=>d.invoice))+1 : 1;
 
-    localStorage.setItem("cars", JSON.stringify(data));
+    data.push({invoice,car,customer,phone,fee,status});
+    localStorage.setItem("cars",JSON.stringify(data));
 
-    clear();
     render();
-}
 
-// CLEAR INPUTS
-function clear(){
     document.getElementById("car").value="";
     document.getElementById("customer").value="";
     document.getElementById("phone").value="";
     document.getElementById("fee").value="";
-    document.getElementById("reason").value="";
-    document.getElementById("file").value="";
 }
 
-// RENDER + SEARCH BY CAR NUMBER
+// RENDER
 function render(){
 
-    let list = document.getElementById("list");
-    list.innerHTML="";
+    let table = document.getElementById("tableData");
+    table.innerHTML="";
 
-    let search = document.getElementById("search").value.toLowerCase();
+    let filtered = data;
 
-    data.forEach((d,i)=>{
+    if(tab!=="all"){
+        filtered = data.filter(i=>i.status===tab);
+    }
 
-        if(d.car.toLowerCase().includes(search)){
+    let total = filtered.length;
+    let earnings = 0;
 
-            list.innerHTML += `
-            <div class="card record">
-
-                🚗 <b>${d.car}</b><br>
-                👤 ${d.customer}<br>
-                📞 ${d.phone}<br>
-                💰 ${d.fee}<br>
-                📊 ${d.status}<br>
-                ❗ ${d.reason || "-"}<br>
-                📎 ${d.file || "No file"}<br>
-
-                <button onclick="del(${i})">Delete</button>
-
-            </div>
-            `;
+    filtered.forEach(item=>{
+        if(item.status==="Completed"){
+            earnings += Number(item.fee);
         }
+
+        table.innerHTML += `
+        <tr>
+            <td>${item.invoice}</td>
+            <td>${item.car}</td>
+            <td>${item.customer}</td>
+            <td>${item.phone}</td>
+            <td>${item.fee}</td>
+            <td>${item.status}</td>
+        </tr>`;
+    });
+
+    document.getElementById("total").innerText = total;
+    document.getElementById("earnings").innerText = earnings;
+}
+
+// PDF EXPORT
+function downloadPDF(){
+
+    const { jsPDF } = window.jspdf;
+
+    html2canvas(document.getElementById("invoiceArea")).then(canvas=>{
+
+        let img = canvas.toDataURL("image/png");
+
+        let pdf = new jsPDF("p","mm","a4");
+
+        let w = 190;
+        let h = canvas.height * w / canvas.width;
+
+        pdf.addImage(img,"PNG",10,10,w,h);
+        pdf.save("Car_Transfer_Invoice.pdf");
     });
 }
 
-// DELETE
-function del(i){
-    data.splice(i,1);
-    localStorage.setItem("cars", JSON.stringify(data));
-    render();
-}
-
-// LANGUAGE TOGGLE
-function setLang(lang){
-    if(lang === "ar"){
-        document.body.classList.add("rtl");
-        document.getElementById("title").innerText="🚗 نظام إدارة نقل السيارات";
-    }else{
-        document.body.classList.remove("rtl");
-        document.getElementById("title").innerText="🚗 Car Transfer System";
-    }
-}
+render();
 
 </script>
 
