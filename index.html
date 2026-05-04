@@ -82,9 +82,7 @@ th{background:#1f2937;}
     <div class="loginCard">
         <h3>Login</h3>
 
-        <!-- password change -->
         <input type="password" id="pass" placeholder="Enter Password">
-
         <button onclick="login()">Login</button>
         <button onclick="changePassword()">Change Password</button>
     </div>
@@ -143,6 +141,12 @@ th{background:#1f2937;}
 let data = JSON.parse(localStorage.getItem("cars")) || [];
 let password = localStorage.getItem("pass") || "1234";
 
+/* AUTO LOAD */
+window.onload = function(){
+    data = JSON.parse(localStorage.getItem("cars")) || [];
+    render();
+};
+
 /* LOGIN */
 function login(){
     let p = document.getElementById("pass").value;
@@ -154,7 +158,7 @@ function login(){
     }
 }
 
-/* 1️⃣ CHANGE PASSWORD */
+/* CHANGE PASSWORD */
 function changePassword(){
     let oldPass = prompt("Old Password?");
     if(oldPass !== password){
@@ -190,7 +194,7 @@ function addData(){
     }
 
     data.push({
-        id: Date.now(),   // for edit/delete
+        id: Date.now(),
         car,
         plate,
         customer,
@@ -212,15 +216,22 @@ function addData(){
     document.getElementById("file").value="";
 }
 
-/* 💾 SAVE */
+/* SAVE */
 function saveData(){
     localStorage.setItem("cars", JSON.stringify(data));
     alert("Records Saved ✔");
 }
 
-/* 2️⃣ EDIT */
+/* DELETE */
+function deleteData(id){
+    data = data.filter(d => d.id !== id);
+    render();
+}
+
+/* EDIT */
 function editData(id){
     let item = data.find(d => d.id === id);
+    if(!item) return;
 
     document.getElementById("car").value = item.car;
     document.getElementById("plate").value = item.plate;
@@ -229,12 +240,6 @@ function editData(id){
     document.getElementById("fee").value = item.fee;
     document.getElementById("reason").value = item.reason;
 
-    data = data.filter(d => d.id !== id);
-    render();
-}
-
-/* 3️⃣ DELETE */
-function deleteData(id){
     data = data.filter(d => d.id !== id);
     render();
 }
@@ -255,10 +260,7 @@ function render(){
             <td>${item.fee}</td>
             <td>${item.status}</td>
             <td>${item.reason || "-"}</td>
-
-            <!-- 2️⃣ IMAGE SHOW FIX -->
             <td>${item.file ? "📎 " + item.file : "-"}</td>
-
             <td>
                 <button onclick="editData(${item.id})">Edit</button>
                 <button onclick="deleteData(${item.id})">Delete</button>
@@ -266,9 +268,9 @@ function render(){
         </tr>
         `;
     });
-}
 
-render();
+    localStorage.setItem("cars", JSON.stringify(data));
+}
 
 </script>
 
