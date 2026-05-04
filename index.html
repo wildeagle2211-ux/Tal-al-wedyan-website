@@ -13,7 +13,11 @@ body{
     color:white;
 }
 
-/* LOGIN */
+/* LOGIN LOCK */
+body.locked .container{
+    display:none;
+}
+
 #loginBox{
     position:fixed;
     inset:0;
@@ -71,7 +75,7 @@ th{
 
 </head>
 
-<body>
+<body class="locked">
 
 <!-- 🔐 LOGIN -->
 <div id="loginBox">
@@ -87,17 +91,21 @@ th{
 
 <div class="card">
 
-<!-- 🏢 COMPANY HEADER (FIXED) -->
+<!-- 🏢 HEADER -->
 <div style="text-align:center;margin-bottom:10px;">
     <h2>🚗 شركة تل الوديان للتجارة</h2>
     <p>Car Transfer System Pro</p>
 </div>
 
 <!-- 🔍 SEARCH -->
-<input type="text" id="search" placeholder="Search Car / Name / Plate / ا ب ت 123" onkeyup="render()">
+<input type="text" id="search" placeholder="Search Car / Plate / Name / ا ب ت 123" onkeyup="render()">
 
 <!-- FORM -->
 <input type="text" id="car" placeholder="Car Name / اسم السيارة">
+
+<!-- 🚗 NUMBER PLATE -->
+<input type="text" id="plate" placeholder="Car Number Plate / رقم اللوحة">
+
 <input type="text" id="customer" placeholder="Customer Name / اسم العميل">
 <input type="text" id="phone" placeholder="Phone Number / رقم الهاتف">
 <input type="number" id="fee" placeholder="Transfer Fee / رسوم النقل">
@@ -119,6 +127,7 @@ th{
 <thead>
 <tr>
 <th>Car</th>
+<th>Plate</th>
 <th>Customer</th>
 <th>Phone</th>
 <th>Fee</th>
@@ -142,8 +151,10 @@ let password = localStorage.getItem("pass") || "1234";
 /* 🔐 LOGIN */
 function login(){
     let p = document.getElementById("pass").value;
+
     if(p === password){
         document.getElementById("loginBox").style.display="none";
+        document.body.classList.remove("locked");
     }else{
         alert("Wrong Password");
     }
@@ -153,6 +164,7 @@ function login(){
 function addData(){
 
     let car = document.getElementById("car").value;
+    let plate = document.getElementById("plate").value;
     let customer = document.getElementById("customer").value;
     let phone = document.getElementById("phone").value;
     let fee = document.getElementById("fee").value;
@@ -162,20 +174,21 @@ function addData(){
     let fileInput = document.getElementById("file");
     let fileName = fileInput.files.length > 0 ? fileInput.files[0].name : "";
 
-    if(car=="" || customer=="" || phone=="" || fee==""){
+    if(car=="" || plate=="" || customer=="" || phone=="" || fee==""){
         alert("Fill all fields");
         return;
     }
 
     data.push({
         car,
+        plate,
         customer,
         phone,
         fee,
         status,
         reason,
         file:fileName,
-        searchKey:(car+" "+customer+" "+phone+" "+reason).toLowerCase()
+        searchKey:(car+" "+plate+" "+customer+" "+phone+" "+reason).toLowerCase()
     });
 
     localStorage.setItem("cars", JSON.stringify(data));
@@ -183,6 +196,7 @@ function addData(){
     render();
 
     document.getElementById("car").value="";
+    document.getElementById("plate").value="";
     document.getElementById("customer").value="";
     document.getElementById("phone").value="";
     document.getElementById("fee").value="";
@@ -206,6 +220,7 @@ function render(){
         table.innerHTML += `
         <tr>
             <td>${item.car}</td>
+            <td>${item.plate}</td>
             <td>${item.customer}</td>
             <td>${item.phone}</td>
             <td>${item.fee}</td>
