@@ -3,15 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>شركة تل الوديان للتجارة</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
 <style>
 
 body{
     margin:0;
-    font-family:Arial;
-    background:#1e3c72;
-    color:white;
+    font-family:Segoe UI;
+    background:#0f172a;
 }
 
 /* LOGIN */
@@ -19,27 +21,15 @@ body{
     width:320px;
     margin:80px auto;
     background:white;
-    color:black;
     padding:20px;
     border-radius:10px;
     text-align:center;
 }
 
-/* APP */
-.container{
-    max-width:1000px;
-    margin:20px auto;
-    background:white;
-    color:black;
-    padding:20px;
-    border-radius:10px;
-}
-
-/* INPUT */
-input{
+input,select{
     width:100%;
     padding:10px;
-    margin:8px 0;
+    margin:6px 0;
 }
 
 /* BUTTON */
@@ -53,32 +43,56 @@ button{
     cursor:pointer;
 }
 
-button:hover{
-    background:#1e40af;
+/* APP */
+.container{
+    max-width:1100px;
+    margin:20px auto;
+    background:white;
+    padding:20px;
+    border-radius:10px;
 }
 
-/* CARD */
+/* FORM */
+.grid{
+    display:grid;
+    grid-template-columns:1fr 2fr;
+    gap:10px;
+}
+
+label{font-weight:bold;}
+
 .card{
-    background:#f8fafc;
-    padding:15px;
-    margin-top:10px;
-    border-radius:8px;
-    border-left:5px solid #2563eb;
+    border:1px solid #ddd;
+    padding:20px;
+    margin-top:20px;
+    page-break-inside:avoid;
 }
 
+/* HEADER INVOICE */
+.invoice-header{
+    text-align:center;
+    border-bottom:2px solid #000;
+    margin-bottom:10px;
+}
+
+.invoice-header h2{
+    margin:5px 0;
+}
+
+/* IMAGE */
 img{
-    width:120px;
+    width:130px;
     margin-top:10px;
-    border-radius:6px;
+}
+
+/* PRINT */
+@media print{
+button,input,select{display:none;}
+body{background:white;}
 }
 
 .hidden{display:none;}
-
-/* SUCCESS MESSAGE */
-#msg{
-    color:green;
-    font-weight:bold;
-}
+#msg{color:green;font-weight:bold;}
 
 </style>
 </head>
@@ -87,10 +101,11 @@ img{
 
 <!-- LOGIN -->
 <div id="loginPage">
-<h2>Login</h2>
+<h2 id="loginText">Login</h2>
 <input id="user" placeholder="Username">
 <input id="pass" type="password" placeholder="Password">
 <button onclick="login()">Login</button>
+<button onclick="toggleLang()">AR / EN</button>
 <p>admin / 1234</p>
 </div>
 
@@ -101,86 +116,103 @@ img{
 
 <h2>شركة تل الوديان للتجارة</h2>
 
-<!-- MESSAGE -->
 <p id="msg"></p>
 
-<!-- FORM -->
-<h3>Add Car</h3>
+<input id="search" placeholder="Search..." onkeyup="searchData()">
 
-<input id="carName" placeholder="Car Name">
-<input id="plate" placeholder="Plate Number">
-<input id="customer" placeholder="Customer Name">
+<div class="grid">
 
-<input id="image" type="file">
+<label id="l1">Car Name</label><input id="carName">
+<label id="l2">Plate Number</label><input id="plate">
+<label id="l3">Model</label><input id="model">
+<label id="l4">Customer Name</label><input id="customer">
+<label id="l5">Phone Number</label><input id="phone">
+<label id="l6">Price with VAT</label><input id="price">
+<label id="l7">Transfer Fee</label><input id="fee">
+<label id="l8">Transfer</label>
+<select id="transfer"><option>Yes</option><option>No</option></select>
+<label id="l9">Reason</label><input id="reason">
 
-<button onclick="addCar()">Save Data</button>
-<button onclick="window.print()">Print</button>
+<label>Image</label><input type="file" id="img">
+<label>Document</label><input type="file" id="doc">
+
+</div>
+
+<button onclick="saveData()">Save</button>
+<button onclick="window.print()">Print Invoice</button>
 
 <hr>
-
-<h3>Records</h3>
 
 <div id="list"></div>
 
 </div>
-
 </div>
 
 <script>
 
-let cars=[];
+let cars=JSON.parse(localStorage.getItem("cars"))||[];
+let inv=cars.length+1;
+let editIndex=-1;
+let lang="en";
 
 /* LOGIN */
 function login(){
 if(user.value==="admin" && pass.value==="1234"){
 loginPage.style.display="none";
 app.style.display="block";
-}else{
-alert("Wrong login");
+render();
+}else alert("Wrong login");
 }
-}
 
-/* ADD CAR */
-function addCar(){
+/* SAVE */
+function saveData(){
 
-let file=image.files[0];
-
-if(file){
+let code="INV-"+String(inv).padStart(2,'0');
+let date=new Date().toLocaleDateString();
 
 let reader=new FileReader();
+let file=img.files[0];
 
 reader.onload=function(){
 
-cars.push({
+let data={
+inv:code,
+date:date,
 name:carName.value,
 plate:plate.value,
+model:model.value,
 customer:customer.value,
+phone:phone.value,
+price:price.value,
+fee:fee.value,
+transfer:transfer.value,
+reason:reason.value,
 img:reader.result
-});
+};
 
-msg.innerText="✔ Data saved successfully";
+if(editIndex===-1){
+cars.push(data);
+inv++;
+}else{
+cars[editIndex]=data;
+editIndex=-1;
+}
 
+localStorage.setItem("cars",JSON.stringify(cars));
+msg.innerText="✔ Saved Successfully";
+clearForm();
 render();
 
 };
 
-reader.readAsDataURL(file);
-
-}else{
-
-cars.push({
-name:carName.value,
-plate:plate.value,
-customer:customer.value,
-img:""
-});
-
-msg.innerText="✔ Data saved successfully";
-
-render();
+if(file) reader.readAsDataURL(file);
+else reader.onload();
 
 }
 
+/* CLEAR */
+function clearForm(){
+document.querySelectorAll("input").forEach(i=>i.value="");
 }
 
 /* RENDER */
@@ -188,16 +220,37 @@ function render(){
 
 let html="";
 
-cars.forEach(c=>{
+cars.forEach((c,i)=>{
 
 html+=`
 <div class="card">
 
+<div class="invoice-header">
+<h2>شركة تل الوديان للتجارة</h2>
+<h4>Tal Al Wadyan Trading</h4>
+</div>
+
+<p><b>Invoice:</b> ${c.inv}</p>
+<p><b>Date:</b> ${c.date}</p>
+
 <p><b>Car:</b> ${c.name}</p>
 <p><b>Plate:</b> ${c.plate}</p>
+<p><b>Model:</b> ${c.model}</p>
 <p><b>Customer:</b> ${c.customer}</p>
+<p><b>Phone:</b> ${c.phone}</p>
+<p><b>Price with VAT:</b> ${c.price}</p>
+<p><b>Fee:</b> ${c.fee}</p>
+<p><b>Transfer:</b> ${c.transfer}</p>
+<p><b>Reason:</b> ${c.reason}</p>
 
-${c.img ? `<img src="${c.img}">` : "<p>No Image</p>"}
+${c.img?`<img src="${c.img}">`:""}
+
+<div id="qr${i}"></div>
+
+<button onclick="makeQR('${c.inv}','qr${i}')">QR</button>
+
+<button onclick="edit(${i})">Edit</button>
+<button onclick="del(${i})">Delete</button>
 
 </div>
 `;
@@ -206,6 +259,73 @@ ${c.img ? `<img src="${c.img}">` : "<p>No Image</p>"}
 
 list.innerHTML=html;
 
+}
+
+/* DELETE */
+function del(i){
+cars.splice(i,1);
+localStorage.setItem("cars",JSON.stringify(cars));
+render();
+}
+
+/* EDIT */
+function edit(i){
+let c=cars[i];
+carName.value=c.name;
+plate.value=c.plate;
+model.value=c.model;
+customer.value=c.customer;
+phone.value=c.phone;
+price.value=c.price;
+fee.value=c.fee;
+reason.value=c.reason;
+editIndex=i;
+}
+
+/* SEARCH */
+function searchData(){
+let val=search.value.toLowerCase();
+let filtered=cars.filter(c =>
+c.inv.toLowerCase().includes(val) ||
+c.plate.toLowerCase().includes(val) ||
+c.customer.toLowerCase().includes(val)
+);
+list.innerHTML=filtered.map(c=>`<div class="card"><h3>${c.inv}</h3><p>${c.customer}</p></div>`).join("");
+}
+
+/* QR */
+function makeQR(text,id){
+document.getElementById(id).innerHTML="";
+new QRCode(document.getElementById(id),{text:text,width:100,height:100});
+}
+
+/* LANGUAGE */
+function toggleLang(){
+if(lang==="en"){
+lang="ar";
+document.body.style.direction="rtl";
+l1.innerText="اسم السيارة";
+l2.innerText="رقم اللوحة";
+l3.innerText="الموديل";
+l4.innerText="اسم العميل";
+l5.innerText="رقم الهاتف";
+l6.innerText="السعر شامل الضريبة";
+l7.innerText="رسوم النقل";
+l8.innerText="نقل";
+l9.innerText="السبب";
+}else{
+lang="en";
+document.body.style.direction="ltr";
+l1.innerText="Car Name";
+l2.innerText="Plate Number";
+l3.innerText="Model";
+l4.innerText="Customer Name";
+l5.innerText="Phone Number";
+l6.innerText="Price with VAT";
+l7.innerText="Transfer Fee";
+l8.innerText="Transfer";
+l9.innerText="Reason";
+}
 }
 
 </script>
