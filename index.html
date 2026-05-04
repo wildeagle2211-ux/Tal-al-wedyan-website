@@ -19,17 +19,11 @@ body{
     background:#111827;
 }
 
-.header h1{
-    margin:0;
-    font-size:26px;
-}
-
 .header p{
-    margin:5px 0 0;
     color:#38bdf8;
 }
 
-/* CONTACT BAR */
+/* CONTACT */
 .contact{
     text-align:center;
     background:#38bdf8;
@@ -38,9 +32,9 @@ body{
     font-weight:bold;
 }
 
-/* MAIN CONTAINER */
+/* CONTAINER */
 .container{
-    max-width:900px;
+    max-width:1000px;
     margin:auto;
     padding:20px;
 }
@@ -48,9 +42,9 @@ body{
 /* CARD */
 .card{
     background:#111827;
-    padding:20px;
+    padding:15px;
     border-radius:12px;
-    margin-top:20px;
+    margin-top:15px;
 }
 
 /* INPUTS */
@@ -62,7 +56,7 @@ input, select{
     border-radius:8px;
 }
 
-/* BUTTONS */
+/* BUTTON */
 button{
     padding:10px;
     background:#38bdf8;
@@ -70,36 +64,26 @@ button{
     border-radius:8px;
     font-weight:bold;
     cursor:pointer;
-    margin-top:10px;
-    margin-right:5px;
+    margin:5px 0;
 }
 
-/* LIST */
-ul{
-    margin-top:15px;
-}
-
-/* TABLE */
-table{
-    width:100%;
-    margin-top:20px;
-    border-collapse:collapse;
-}
-
-th, td{
-    border:1px solid #333;
-    padding:10px;
-    text-align:center;
-}
-
-th{
+/* RECORD CARD */
+.record{
     background:#1f2937;
+    padding:10px;
+    margin-top:10px;
+    border-radius:10px;
 }
 
-/* RTL SUPPORT */
+/* RTL */
 .rtl{
     direction:rtl;
     text-align:right;
+}
+
+/* SEARCH */
+.searchBox{
+    margin-top:10px;
 }
 </style>
 
@@ -111,55 +95,52 @@ th{
 <div class="header">
     <h1>شركة تل الوديان للتجارة</h1>
     <p>Tel Al Wadiyan Trading Company</p>
+
+    <button onclick="setLang('en')">English</button>
+    <button onclick="setLang('ar')">العربية</button>
 </div>
 
 <!-- CONTACT -->
 <div class="contact">
-    📞 +966539115111
+📞 +966539115111
 </div>
 
 <div class="container">
 
-<!-- CAR FORM -->
+<!-- INPUT -->
 <div class="card">
 
-<h2>🚗 Car Transfer System</h2>
+<h2 id="title">🚗 Car Transfer System</h2>
 
-<input type="text" id="car" placeholder="Car Name / اسم السيارة">
-<input type="text" id="customer" placeholder="Customer Name / اسم العميل">
-<input type="text" id="phone" placeholder="Phone Number / رقم الهاتف">
-<input type="number" id="fee" placeholder="Transfer Fee / رسوم النقل">
+<input id="car" placeholder="Car Number / رقم السيارة (ا ب ت 123)">
+<input id="customer" placeholder="Customer Name / اسم العميل">
+<input id="phone" placeholder="Phone Number / رقم الهاتف">
+<input id="fee" placeholder="Transfer Fee / رسوم النقل">
 
 <select id="status">
     <option value="Completed">Completed / تم النقل</option>
     <option value="Pending">Pending / لم يتم النقل</option>
 </select>
 
-<button onclick="addData()">Add Record</button>
+<input id="reason" placeholder="Reason (if not transferred) / سبب عدم النقل">
+
+<input type="file" id="file">
+
+<button onclick="addData()">Save Record</button>
 <button onclick="window.print()">Print</button>
 
-<table>
-<thead>
-<tr>
-<th>Car</th>
-<th>Customer</th>
-<th>Phone</th>
-<th>Fee</th>
-<th>Status</th>
-</tr>
-</thead>
-
-<tbody id="tableData"></tbody>
-
-</table>
+<!-- SEARCH BY CAR NUMBER -->
+<input class="searchBox" id="search" placeholder="Search by Car Number / ا ب ت 123" onkeyup="render()">
 
 </div>
+
+<!-- RECORDS -->
+<div id="list"></div>
 
 </div>
 
 <script>
 
-// DATA STORAGE
 let data = JSON.parse(localStorage.getItem("cars")) || [];
 
 render();
@@ -172,9 +153,13 @@ function addData(){
     let phone = document.getElementById("phone").value;
     let fee = document.getElementById("fee").value;
     let status = document.getElementById("status").value;
+    let reason = document.getElementById("reason").value;
+
+    let fileInput = document.getElementById("file");
+    let file = fileInput.files.length ? fileInput.files[0].name : "";
 
     if(car=="" || customer=="" || phone=="" || fee==""){
-        alert("Please fill all fields");
+        alert("Please fill all required fields");
         return;
     }
 
@@ -183,36 +168,74 @@ function addData(){
         customer,
         phone,
         fee,
-        status
+        status,
+        reason,
+        file
     });
 
     localStorage.setItem("cars", JSON.stringify(data));
 
+    clear();
     render();
+}
 
+// CLEAR INPUTS
+function clear(){
     document.getElementById("car").value="";
     document.getElementById("customer").value="";
     document.getElementById("phone").value="";
     document.getElementById("fee").value="";
+    document.getElementById("reason").value="";
+    document.getElementById("file").value="";
 }
 
-// RENDER TABLE
+// RENDER + SEARCH BY CAR NUMBER
 function render(){
 
-    let table = document.getElementById("tableData");
-    table.innerHTML="";
+    let list = document.getElementById("list");
+    list.innerHTML="";
 
-    data.forEach(item=>{
-        table.innerHTML += `
-        <tr>
-            <td>${item.car}</td>
-            <td>${item.customer}</td>
-            <td>${item.phone}</td>
-            <td>${item.fee}</td>
-            <td>${item.status}</td>
-        </tr>
-        `;
+    let search = document.getElementById("search").value.toLowerCase();
+
+    data.forEach((d,i)=>{
+
+        if(d.car.toLowerCase().includes(search)){
+
+            list.innerHTML += `
+            <div class="card record">
+
+                🚗 <b>${d.car}</b><br>
+                👤 ${d.customer}<br>
+                📞 ${d.phone}<br>
+                💰 ${d.fee}<br>
+                📊 ${d.status}<br>
+                ❗ ${d.reason || "-"}<br>
+                📎 ${d.file || "No file"}<br>
+
+                <button onclick="del(${i})">Delete</button>
+
+            </div>
+            `;
+        }
     });
+}
+
+// DELETE
+function del(i){
+    data.splice(i,1);
+    localStorage.setItem("cars", JSON.stringify(data));
+    render();
+}
+
+// LANGUAGE TOGGLE
+function setLang(lang){
+    if(lang === "ar"){
+        document.body.classList.add("rtl");
+        document.getElementById("title").innerText="🚗 نظام إدارة نقل السيارات";
+    }else{
+        document.body.classList.remove("rtl");
+        document.getElementById("title").innerText="🚗 Car Transfer System";
+    }
 }
 
 </script>
