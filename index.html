@@ -1,38 +1,63 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tal Al Wedyan - Car System</title>
+<title>Tal Al Wedyan - Pro System</title>
 
 <style>
 body{
-    font-family:Arial;
     margin:0;
-    padding:20px;
+    font-family:Arial;
     background:#0f172a;
     color:white;
 }
 
-.container{max-width:1000px;margin:auto;}
-.card{background:#111827;padding:20px;border-radius:12px;}
+/* LOGIN */
+#loginBox{
+    position:fixed;
+    inset:0;
+    background:#000000ee;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.loginCard{
+    background:#111827;
+    padding:20px;
+    border-radius:10px;
+    width:300px;
+}
+
+.container{
+    max-width:1100px;
+    margin:auto;
+    padding:20px;
+}
+
+.card{
+    background:#111827;
+    padding:20px;
+    border-radius:12px;
+}
 
 input, select{
     width:100%;
     padding:10px;
-    margin:5px 0;
+    margin:6px 0;
     border-radius:8px;
     border:none;
 }
 
 button{
     padding:10px;
-    background:#38bdf8;
+    margin:5px;
     border:none;
     border-radius:8px;
-    font-weight:bold;
     cursor:pointer;
-    margin:5px;
+    background:#38bdf8;
+    font-weight:bold;
 }
 
 table{
@@ -47,23 +72,39 @@ th, td{
     text-align:center;
 }
 
-th{background:#1f2937;}
+th{
+    background:#1f2937;
+}
 
 img{
-    max-width:70px;
-    border-radius:5px;
+    max-width:60px;
+    border-radius:6px;
+}
+
+.searchBox{
+    margin:10px 0;
 }
 </style>
 </head>
 
 <body>
 
+<!-- LOGIN -->
+<div id="loginBox">
+    <div class="loginCard">
+        <h3>Admin Login</h3>
+        <input type="password" id="pass" placeholder="Enter Password">
+        <button onclick="login()">Login</button>
+    </div>
+</div>
+
 <div class="container">
 <div class="card">
 
-<h2 style="text-align:center;">🚗 Tal Al Wedyan Car System</h2>
+<h2 style="text-align:center;">🚗 Tal Al Wedyan PRO SYSTEM</h2>
 
-<!-- FORM -->
+<input class="searchBox" type="text" id="search" onkeyup="render()" placeholder="Search...">
+
 <input type="text" id="car" placeholder="Car Name">
 <input type="text" id="plate" placeholder="Plate Number">
 <input type="text" id="customer" placeholder="Customer Name">
@@ -78,8 +119,7 @@ img{
 
 <input type="file" id="file">
 
-<button onclick="addData()">Add Record</button>
-<button onclick="window.print()">Print All</button>
+<button onclick="addData()">Add</button>
 
 <table>
 <thead>
@@ -105,8 +145,19 @@ img{
 <script>
 
 let data = JSON.parse(localStorage.getItem("cars")) || [];
+let password = localStorage.getItem("pass") || "1234";
 
-/* ADD DATA */
+/* LOGIN */
+function login(){
+    let p = document.getElementById("pass").value;
+    if(p === password){
+        document.getElementById("loginBox").style.display="none";
+    } else {
+        alert("Wrong Password");
+    }
+}
+
+/* ADD */
 function addData(){
 
     let car = document.getElementById("car").value;
@@ -116,53 +167,45 @@ function addData(){
     let fee = document.getElementById("fee").value;
     let reason = document.getElementById("reason").value;
     let status = document.getElementById("status").value;
-    let fileInput = document.getElementById("file");
+    let file = document.getElementById("file").files[0];
 
-    if(!car || !plate || !customer || !phone || !fee){
-        alert("Fill all fields");
+    if(!car || !plate){
+        alert("Fill required fields");
         return;
     }
 
-    let file = fileInput.files[0];
-
     if(file){
         let reader = new FileReader();
-
         reader.onload = function(e){
-            data.push({
-                id: Date.now(),
-                car,
-                plate,
-                customer,
-                phone,
-                fee,
-                status,
-                reason,
-                file: e.target.result
-            });
-
-            save();
-            render();
-        };
-
+            saveItem(e.target.result);
+        }
         reader.readAsDataURL(file);
     } else {
-        data.push({
-            id: Date.now(),
-            car,
-            plate,
-            customer,
-            phone,
-            fee,
-            status,
-            reason,
-            file: null
-        });
-
-        save();
-        render();
+        saveItem(null);
     }
 
+    function saveItem(img){
+        data.push({
+            id:Date.now(),
+            car, plate, customer, phone, fee, reason, status,
+            file:img
+        });
+
+        localStorage.setItem("cars", JSON.stringify(data));
+        clear();
+        render();
+    }
+}
+
+/* DELETE */
+function del(id){
+    data = data.filter(x=>x.id !== id);
+    localStorage.setItem("cars", JSON.stringify(data));
+    render();
+}
+
+/* CLEAR */
+function clear(){
     document.getElementById("car").value="";
     document.getElementById("plate").value="";
     document.getElementById("customer").value="";
@@ -172,36 +215,34 @@ function addData(){
     document.getElementById("file").value="";
 }
 
-/* SAVE */
-function save(){
-    localStorage.setItem("cars", JSON.stringify(data));
-}
-
-/* DELETE */
-function del(id){
-    data = data.filter(x => x.id !== id);
-    save();
-    render();
-}
-
 /* RENDER */
 function render(){
 
-    let table = document.getElementById("tableData");
-    table.innerHTML = "";
+    let search = document.getElementById("search")?.value || "";
 
-    data.forEach(item=>{
+    let table = document.getElementById("tableData");
+    table.innerHTML="";
+
+    data
+    .filter(item =>
+        item.car.includes(search) ||
+        item.plate.includes(search) ||
+        item.customer?.includes(search)
+    )
+    .forEach(item=>{
         table.innerHTML += `
         <tr>
             <td>${item.car}</td>
             <td>${item.plate}</td>
-            <td>${item.customer}</td>
-            <td>${item.phone}</td>
-            <td>${item.fee}</td>
+            <td>${item.customer || "-"}</td>
+            <td>${item.phone || "-"}</td>
+            <td>${item.fee || "-"}</td>
             <td>${item.status}</td>
-            <td>${item.reason}</td>
+            <td>${item.reason || "-"}</td>
             <td>${item.file ? `<img src="${item.file}">` : "-"}</td>
-            <td><button onclick="del(${item.id})">Delete</button></td>
+            <td>
+                <button onclick="del(${item.id})">Delete</button>
+            </td>
         </tr>
         `;
     });
