@@ -69,7 +69,7 @@ th{background:#1f2937;}
 
 <body>
 
-<!-- LOGIN -->
+<!-- 🔐 LOGIN -->
 <div id="loginBox">
     <div class="loginCard">
         <h3>Login</h3>
@@ -82,25 +82,29 @@ th{background:#1f2937;}
 <div class="container">
 <div class="card">
 
-<h2 style="text-align:center;">🚗 Car Transfer System</h2>
+<!-- 🇸🇦 HEADER (Arabic FIXED) -->
+<div style="text-align:center;margin-bottom:10px;">
+    <h2>🚗 شركة تل الوديان للتجارة - +966539115111</h2>
+    <p>Car Transfer System Pro</p>
+</div>
 
 <!-- FORM -->
-<input type="text" id="car" placeholder="Car Name">
-<input type="text" id="plate" placeholder="Plate">
-<input type="text" id="customer" placeholder="Customer">
-<input type="text" id="phone" placeholder="Phone">
-<input type="number" id="fee" placeholder="Fee">
-<input type="text" id="reason" placeholder="Reason">
+<input type="text" id="car" placeholder="Car Name / اسم السيارة">
+<input type="text" id="plate" placeholder="Car Number Plate / رقم اللوحة">
+<input type="text" id="customer" placeholder="Customer Name / اسم العميل">
+<input type="text" id="phone" placeholder="Phone Number / رقم الهاتف">
+<input type="number" id="fee" placeholder="Transfer Fee / رسوم النقل">
+<input type="text" id="reason" placeholder="Reason / سبب النقل">
 
 <select id="status">
-    <option value="Completed">Completed</option>
-    <option value="Pending">Pending</option>
+    <option value="Completed">Completed / تم النقل</option>
+    <option value="Pending">Pending / لم يتم النقل</option>
 </select>
 
 <input type="file" id="file">
 
-<button onclick="addData()">Add</button>
-<button onclick="saveData()">Save</button>
+<button onclick="addData()">Add Record</button>
+<button onclick="saveData()">Save Record</button>
 
 <table>
 <thead>
@@ -125,29 +129,10 @@ th{background:#1f2937;}
 
 <script>
 
-/* ===== DATA LOAD FIX ===== */
-let data = [];
-
-function loadData(){
-    let stored = localStorage.getItem("cars");
-    if(stored){
-        try{
-            data = JSON.parse(stored);
-        }catch(e){
-            data = [];
-        }
-    }
-}
-
+let data = JSON.parse(localStorage.getItem("cars")) || [];
 let password = localStorage.getItem("pass") || "1234";
 
-/* ===== INIT ===== */
-window.onload = function(){
-    loadData();
-    render();
-};
-
-/* ===== LOGIN ===== */
+/* LOGIN */
 function login(){
     let p = document.getElementById("pass").value;
 
@@ -158,11 +143,11 @@ function login(){
     }
 }
 
-/* ===== PASSWORD CHANGE ===== */
+/* PASSWORD CHANGE */
 function changePassword(){
     let old = prompt("Old Password?");
     if(old !== password){
-        alert("Wrong");
+        alert("Wrong Password");
         return;
     }
 
@@ -170,11 +155,11 @@ function changePassword(){
     if(np){
         password = np;
         localStorage.setItem("pass", np);
-        alert("Changed ✔");
+        alert("Password Changed ✔");
     }
 }
 
-/* ===== ADD DATA ===== */
+/* ADD DATA (IMAGE FIXED) */
 function addData(){
 
     let car = document.getElementById("car").value;
@@ -186,26 +171,51 @@ function addData(){
     let status = document.getElementById("status").value;
 
     let fileInput = document.getElementById("file");
-    let fileName = fileInput.files.length ? fileInput.files[0].name : "";
+    let file = fileInput.files[0];
 
     if(!car || !plate || !customer || !phone || !fee){
         alert("Fill all fields");
         return;
     }
 
-    data.push({
-        id: Date.now(),
-        car,
-        plate,
-        customer,
-        phone,
-        fee,
-        status,
-        reason,
-        file:fileName
-    });
+    if(file){
+        let reader = new FileReader();
 
-    render();
+        reader.onload = function(e){
+            data.push({
+                id: Date.now(),
+                car,
+                plate,
+                customer,
+                phone,
+                fee,
+                status,
+                reason,
+                file: e.target.result
+            });
+
+            render();
+            saveData();
+        };
+
+        reader.readAsDataURL(file);
+    } else {
+
+        data.push({
+            id: Date.now(),
+            car,
+            plate,
+            customer,
+            phone,
+            fee,
+            status,
+            reason,
+            file: null
+        });
+
+        render();
+        saveData();
+    }
 
     document.getElementById("car").value="";
     document.getElementById("plate").value="";
@@ -216,19 +226,19 @@ function addData(){
     document.getElementById("file").value="";
 }
 
-/* ===== SAVE ===== */
+/* SAVE */
 function saveData(){
     localStorage.setItem("cars", JSON.stringify(data));
-    alert("Saved ✔");
 }
 
-/* ===== DELETE ===== */
+/* DELETE */
 function deleteData(id){
     data = data.filter(x => x.id !== id);
     render();
+    saveData();
 }
 
-/* ===== EDIT ===== */
+/* EDIT */
 function editData(id){
     let item = data.find(x => x.id === id);
     if(!item) return;
@@ -242,13 +252,14 @@ function editData(id){
 
     data = data.filter(x => x.id !== id);
     render();
+    saveData();
 }
 
-/* ===== RENDER ===== */
+/* RENDER */
 function render(){
 
     let table = document.getElementById("tableData");
-    table.innerHTML="";
+    table.innerHTML = "";
 
     data.forEach(item=>{
         table.innerHTML += `
@@ -260,7 +271,9 @@ function render(){
             <td>${item.fee}</td>
             <td>${item.status}</td>
             <td>${item.reason || "-"}</td>
-            <td>${item.file ? item.file : "-"}</td>
+            <td>
+                ${item.file ? `<img src="${item.file}" width="60"/>` : "-"}
+            </td>
             <td>
                 <button onclick="editData(${item.id})">Edit</button>
                 <button onclick="deleteData(${item.id})">Delete</button>
@@ -268,10 +281,9 @@ function render(){
         </tr>
         `;
     });
-
-    // AUTO SAVE SAFE SYNC
-    localStorage.setItem("cars", JSON.stringify(data));
 }
+
+render();
 
 </script>
 
