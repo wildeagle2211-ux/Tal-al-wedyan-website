@@ -13,7 +13,6 @@ body{
     color:white;
 }
 
-/* LOGIN */
 #loginBox{
     position:fixed;
     inset:0;
@@ -30,7 +29,6 @@ body{
     width:300px;
 }
 
-/* MAIN */
 .container{max-width:1000px;margin:auto;}
 .card{background:#111827;padding:20px;border-radius:12px;}
 
@@ -65,24 +63,17 @@ th, td{
 }
 
 th{background:#1f2937;}
-
-@media print{
-    body{background:white;color:black;}
-    #loginBox, button, input, select{display:none;}
-    .card{background:white;color:black;}
-}
 </style>
 
 </head>
 
 <body>
 
-<!-- 🔐 LOGIN -->
+<!-- LOGIN -->
 <div id="loginBox">
     <div class="loginCard">
         <h3>Login</h3>
-
-        <input type="password" id="pass" placeholder="Enter Password">
+        <input type="password" id="pass" placeholder="Password">
         <button onclick="login()">Login</button>
         <button onclick="changePassword()">Change Password</button>
     </div>
@@ -91,29 +82,25 @@ th{background:#1f2937;}
 <div class="container">
 <div class="card">
 
-<div style="text-align:center;margin-bottom:10px;">
-    <h2>🚗 +966539115111 - شركة تل الوديان للتجارة</h2>
-    <p>Car Transfer System Pro</p>
-</div>
+<h2 style="text-align:center;">🚗 Car Transfer System</h2>
 
 <!-- FORM -->
-<input type="text" id="car" placeholder="Car Name / اسم السيارة">
-<input type="text" id="plate" placeholder="Car Number Plate / رقم اللوحة">
-<input type="text" id="customer" placeholder="Customer Name / اسم العميل">
-<input type="text" id="phone" placeholder="Phone Number / رقم الهاتف">
-<input type="number" id="fee" placeholder="Transfer Fee / رسوم النقل">
-<input type="text" id="reason" placeholder="Reason / سبب النقل">
+<input type="text" id="car" placeholder="Car Name">
+<input type="text" id="plate" placeholder="Plate">
+<input type="text" id="customer" placeholder="Customer">
+<input type="text" id="phone" placeholder="Phone">
+<input type="number" id="fee" placeholder="Fee">
+<input type="text" id="reason" placeholder="Reason">
 
 <select id="status">
-    <option value="Completed">Completed / تم النقل</option>
-    <option value="Pending">Pending / لم يتم النقل</option>
+    <option value="Completed">Completed</option>
+    <option value="Pending">Pending</option>
 </select>
 
 <input type="file" id="file">
 
-<button onclick="addData()">Add Record</button>
-<button onclick="saveData()">Save Record</button>
-<button onclick="window.print()">Print / طباعة</button>
+<button onclick="addData()">Add</button>
+<button onclick="saveData()">Save</button>
 
 <table>
 <thead>
@@ -138,16 +125,29 @@ th{background:#1f2937;}
 
 <script>
 
-let data = JSON.parse(localStorage.getItem("cars")) || [];
+/* ===== DATA LOAD FIX ===== */
+let data = [];
+
+function loadData(){
+    let stored = localStorage.getItem("cars");
+    if(stored){
+        try{
+            data = JSON.parse(stored);
+        }catch(e){
+            data = [];
+        }
+    }
+}
+
 let password = localStorage.getItem("pass") || "1234";
 
-/* AUTO LOAD */
+/* ===== INIT ===== */
 window.onload = function(){
-    data = JSON.parse(localStorage.getItem("cars")) || [];
+    loadData();
     render();
 };
 
-/* LOGIN */
+/* ===== LOGIN ===== */
 function login(){
     let p = document.getElementById("pass").value;
 
@@ -158,23 +158,23 @@ function login(){
     }
 }
 
-/* CHANGE PASSWORD */
+/* ===== PASSWORD CHANGE ===== */
 function changePassword(){
-    let oldPass = prompt("Old Password?");
-    if(oldPass !== password){
-        alert("Wrong old password");
+    let old = prompt("Old Password?");
+    if(old !== password){
+        alert("Wrong");
         return;
     }
 
-    let newPass = prompt("New Password?");
-    if(newPass){
-        password = newPass;
-        localStorage.setItem("pass", newPass);
-        alert("Password Changed ✔");
+    let np = prompt("New Password?");
+    if(np){
+        password = np;
+        localStorage.setItem("pass", np);
+        alert("Changed ✔");
     }
 }
 
-/* ADD DATA */
+/* ===== ADD DATA ===== */
 function addData(){
 
     let car = document.getElementById("car").value;
@@ -182,13 +182,13 @@ function addData(){
     let customer = document.getElementById("customer").value;
     let phone = document.getElementById("phone").value;
     let fee = document.getElementById("fee").value;
-    let status = document.getElementById("status").value;
     let reason = document.getElementById("reason").value;
+    let status = document.getElementById("status").value;
 
     let fileInput = document.getElementById("file");
-    let fileName = fileInput.files.length > 0 ? fileInput.files[0].name : "";
+    let fileName = fileInput.files.length ? fileInput.files[0].name : "";
 
-    if(car=="" || plate=="" || customer=="" || phone=="" || fee==""){
+    if(!car || !plate || !customer || !phone || !fee){
         alert("Fill all fields");
         return;
     }
@@ -216,21 +216,21 @@ function addData(){
     document.getElementById("file").value="";
 }
 
-/* SAVE */
+/* ===== SAVE ===== */
 function saveData(){
     localStorage.setItem("cars", JSON.stringify(data));
-    alert("Records Saved ✔");
+    alert("Saved ✔");
 }
 
-/* DELETE */
+/* ===== DELETE ===== */
 function deleteData(id){
-    data = data.filter(d => d.id !== id);
+    data = data.filter(x => x.id !== id);
     render();
 }
 
-/* EDIT */
+/* ===== EDIT ===== */
 function editData(id){
-    let item = data.find(d => d.id === id);
+    let item = data.find(x => x.id === id);
     if(!item) return;
 
     document.getElementById("car").value = item.car;
@@ -240,11 +240,11 @@ function editData(id){
     document.getElementById("fee").value = item.fee;
     document.getElementById("reason").value = item.reason;
 
-    data = data.filter(d => d.id !== id);
+    data = data.filter(x => x.id !== id);
     render();
 }
 
-/* RENDER */
+/* ===== RENDER ===== */
 function render(){
 
     let table = document.getElementById("tableData");
@@ -260,7 +260,7 @@ function render(){
             <td>${item.fee}</td>
             <td>${item.status}</td>
             <td>${item.reason || "-"}</td>
-            <td>${item.file ? "📎 " + item.file : "-"}</td>
+            <td>${item.file ? item.file : "-"}</td>
             <td>
                 <button onclick="editData(${item.id})">Edit</button>
                 <button onclick="deleteData(${item.id})">Delete</button>
@@ -269,6 +269,7 @@ function render(){
         `;
     });
 
+    // AUTO SAVE SAFE SYNC
     localStorage.setItem("cars", JSON.stringify(data));
 }
 
