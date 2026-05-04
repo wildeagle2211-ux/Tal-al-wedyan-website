@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <title>Car Transfer System Pro</title>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 <style>
 body{
     font-family:Arial;
@@ -11,11 +14,6 @@ body{
     padding:20px;
     background:#0f172a;
     color:white;
-}
-
-/* LOGIN LOCK */
-body.locked .container{
-    display:none;
 }
 
 #loginBox{
@@ -34,7 +32,6 @@ body.locked .container{
     width:300px;
 }
 
-/* MAIN */
 .container{max-width:1000px;margin:auto;}
 .card{background:#111827;padding:20px;border-radius:12px;}
 
@@ -71,13 +68,20 @@ th, td{
 th{
     background:#1f2937;
 }
+
+/* PRINT CLEAN */
+@media print{
+    body{background:white;color:black;}
+    #loginBox, button, input, select{display:none;}
+    .card{background:white;color:black;}
+}
 </style>
 
 </head>
 
-<body class="locked">
+<body>
 
-<!-- 🔐 LOGIN -->
+<!-- LOGIN -->
 <div id="loginBox">
     <div class="loginCard">
         <h3>Login</h3>
@@ -91,27 +95,21 @@ th{
 
 <div class="card">
 
-<!-- 🏢 HEADER -->
 <div style="text-align:center;margin-bottom:10px;">
     <h2>🚗 شركة تل الوديان للتجارة</h2>
     <p>Car Transfer System Pro</p>
 </div>
 
-<!-- 🔍 SEARCH -->
+<!-- SEARCH -->
 <input type="text" id="search" placeholder="Search Car / Plate / Name / ا ب ت 123" onkeyup="render()">
 
 <!-- FORM -->
 <input type="text" id="car" placeholder="Car Name / اسم السيارة">
-
-<!-- 🚗 NUMBER PLATE -->
 <input type="text" id="plate" placeholder="Car Number Plate / رقم اللوحة">
-
 <input type="text" id="customer" placeholder="Customer Name / اسم العميل">
 <input type="text" id="phone" placeholder="Phone Number / رقم الهاتف">
 <input type="number" id="fee" placeholder="Transfer Fee / رسوم النقل">
-
-<!-- 📝 REASON -->
-<input type="text" id="reason" placeholder="Reason (if not transferred) / سبب عدم النقل">
+<input type="text" id="reason" placeholder="Reason / سبب النقل">
 
 <select id="status">
     <option value="Completed">Completed / تم النقل</option>
@@ -122,6 +120,7 @@ th{
 
 <button onclick="addData()">Add Record</button>
 <button onclick="window.print()">Print / طباعة</button>
+<button onclick="downloadPDF()">Download PDF</button>
 
 <table>
 <thead>
@@ -148,19 +147,17 @@ th{
 let data = JSON.parse(localStorage.getItem("cars")) || [];
 let password = localStorage.getItem("pass") || "1234";
 
-/* 🔐 LOGIN */
+/* LOGIN */
 function login(){
     let p = document.getElementById("pass").value;
-
     if(p === password){
         document.getElementById("loginBox").style.display="none";
-        document.body.classList.remove("locked");
     }else{
         alert("Wrong Password");
     }
 }
 
-/* ADD DATA */
+/* ADD */
 function addData(){
 
     let car = document.getElementById("car").value;
@@ -204,7 +201,7 @@ function addData(){
     document.getElementById("file").value="";
 }
 
-/* RENDER + SEARCH */
+/* RENDER */
 function render(){
 
     let table = document.getElementById("tableData");
@@ -226,13 +223,33 @@ function render(){
             <td>${item.fee}</td>
             <td>${item.status}</td>
             <td>${item.reason || "-"}</td>
-            <td>${item.file || "-"}</td>
+            <td>${item.file ? "📎 " + item.file : "-"}</td>
         </tr>
         `;
     });
 }
 
 render();
+
+/* PDF DOWNLOAD */
+function downloadPDF(){
+
+    const { jsPDF } = window.jspdf;
+
+    html2canvas(document.querySelector(".card")).then(canvas=>{
+
+        let pdf = new jsPDF("p","mm","a4");
+
+        let img = canvas.toDataURL("image/png");
+
+        let w = 190;
+        let h = canvas.height * w / canvas.width;
+
+        pdf.addImage(img,"PNG",10,10,w,h);
+
+        pdf.save("Car_Transfer_Invoice.pdf");
+    });
+}
 
 </script>
 
