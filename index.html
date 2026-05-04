@@ -30,7 +30,6 @@ body{
     width:300px;
 }
 
-/* MAIN */
 .container{max-width:1000px;margin:auto;}
 .card{background:#111827;padding:20px;border-radius:12px;}
 
@@ -64,8 +63,11 @@ th, td{
     text-align:center;
 }
 
-th{
-    background:#1f2937;
+th{background:#1f2937;}
+
+img{
+    max-width:70px;
+    border-radius:5px;
 }
 
 /* PRINT */
@@ -77,10 +79,6 @@ th{
     select{
         display:none !important;
     }
-    .card{
-        background:white;
-        color:black;
-    }
 }
 </style>
 
@@ -88,7 +86,7 @@ th{
 
 <body>
 
-<!-- 🔐 LOGIN -->
+<!-- LOGIN -->
 <div id="loginBox">
     <div class="loginCard">
         <h3>Login</h3>
@@ -101,7 +99,7 @@ th{
 <div class="container">
 <div class="card">
 
-<!-- 🇸🇦 HEADER -->
+<!-- HEADER -->
 <div style="text-align:center;margin-bottom:10px;">
     <h2>🚗 شركة تل الوديان للتجارة - +966539115111</h2>
     <p>Car Transfer System Pro</p>
@@ -122,10 +120,9 @@ th{
 
 <input type="file" id="file">
 
-<!-- BUTTONS -->
 <button onclick="addData()">Add Record</button>
 <button onclick="saveData()">Save Record</button>
-<button onclick="window.print()">Print / طباعة</button>
+<button onclick="window.print()">Print All</button>
 
 <table>
 <thead>
@@ -190,14 +187,14 @@ function addData(){
     let fee = document.getElementById("fee").value;
     let reason = document.getElementById("reason").value;
     let status = document.getElementById("status").value;
-
     let fileInput = document.getElementById("file");
-    let file = fileInput.files[0];
 
     if(!car || !plate || !customer || !phone || !fee){
         alert("Fill all fields");
         return;
     }
+
+    let file = fileInput.files[0];
 
     if(file){
         let reader = new FileReader();
@@ -220,9 +217,7 @@ function addData(){
         };
 
         reader.readAsDataURL(file);
-
     } else {
-
         data.push({
             id: Date.now(),
             car,
@@ -263,7 +258,6 @@ function deleteData(id){
 /* EDIT */
 function editData(id){
     let item = data.find(x => x.id === id);
-    if(!item) return;
 
     document.getElementById("car").value = item.car;
     document.getElementById("plate").value = item.plate;
@@ -275,6 +269,45 @@ function editData(id){
     data = data.filter(x => x.id !== id);
     render();
     saveData();
+}
+
+/* PRINT SINGLE */
+function printSingle(id){
+
+    let item = data.find(x => x.id === id);
+
+    let w = window.open("", "", "width=800,height=600");
+
+    w.document.write(`
+        <html>
+        <head>
+        <title>Print</title>
+        <style>
+            body{font-family:Arial;padding:20px;}
+            img{max-width:200px;}
+        </style>
+        </head>
+        <body>
+
+        <h2>Car Transfer Invoice</h2>
+
+        <p><b>Car:</b> ${item.car}</p>
+        <p><b>Plate:</b> ${item.plate}</p>
+        <p><b>Customer:</b> ${item.customer}</p>
+        <p><b>Phone:</b> ${item.phone}</p>
+        <p><b>Fee:</b> ${item.fee}</p>
+        <p><b>Status:</b> ${item.status}</p>
+        <p><b>Reason:</b> ${item.reason || "-"}</p>
+
+        ${item.file ? `<img src="${item.file}">` : ""}
+
+        <script>window.print();</script>
+
+        </body>
+        </html>
+    `);
+
+    w.document.close();
 }
 
 /* RENDER */
@@ -294,13 +327,12 @@ function render(){
             <td>${item.status}</td>
             <td>${item.reason || "-"}</td>
 
-            <td>
-                ${item.file ? `<img src="${item.file}" width="60"/>` : "-"}
-            </td>
+            <td>${item.file ? `<img src="${item.file}">` : "-"}</td>
 
             <td>
                 <button onclick="editData(${item.id})">Edit</button>
                 <button onclick="deleteData(${item.id})">Delete</button>
+                <button onclick="printSingle(${item.id})">Print</button>
             </td>
         </tr>
         `;
