@@ -4,9 +4,6 @@
 <meta charset="UTF-8">
 <title>Car Transfer System Pro</title>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
 <style>
 body{
     font-family:Arial;
@@ -16,6 +13,7 @@ body{
     color:white;
 }
 
+/* LOGIN */
 #loginBox{
     position:fixed;
     inset:0;
@@ -32,6 +30,7 @@ body{
     width:300px;
 }
 
+/* MAIN */
 .container{max-width:1000px;margin:auto;}
 .card{background:#111827;padding:20px;border-radius:12px;}
 
@@ -81,7 +80,7 @@ th{
 
 <body>
 
-<!-- LOGIN -->
+<!-- 🔐 LOGIN -->
 <div id="loginBox">
     <div class="loginCard">
         <h3>Login</h3>
@@ -95,13 +94,11 @@ th{
 
 <div class="card">
 
+<!-- 🏢 HEADER -->
 <div style="text-align:center;margin-bottom:10px;">
-    <h2>🚗 شركة تل الوديان للتجارة</h2>
+    <h2>🚗 +966539115111 - شركة تل الوديان للتجارة</h2>
     <p>Car Transfer System Pro</p>
 </div>
-
-<!-- SEARCH -->
-<input type="text" id="search" placeholder="Search Car / Plate / Name / ا ب ت 123" onkeyup="render()">
 
 <!-- FORM -->
 <input type="text" id="car" placeholder="Car Name / اسم السيارة">
@@ -119,8 +116,8 @@ th{
 <input type="file" id="file">
 
 <button onclick="addData()">Add Record</button>
+<button onclick="saveData()">Save Record</button>
 <button onclick="window.print()">Print / طباعة</button>
-<button onclick="downloadPDF()">Download PDF</button>
 
 <table>
 <thead>
@@ -150,6 +147,7 @@ let password = localStorage.getItem("pass") || "1234";
 /* LOGIN */
 function login(){
     let p = document.getElementById("pass").value;
+
     if(p === password){
         document.getElementById("loginBox").style.display="none";
     }else{
@@ -157,7 +155,7 @@ function login(){
     }
 }
 
-/* ADD */
+/* ADD DATA */
 function addData(){
 
     let car = document.getElementById("car").value;
@@ -184,11 +182,8 @@ function addData(){
         fee,
         status,
         reason,
-        file:fileName,
-        searchKey:(car+" "+plate+" "+customer+" "+phone+" "+reason).toLowerCase()
+        file:fileName
     });
-
-    localStorage.setItem("cars", JSON.stringify(data));
 
     render();
 
@@ -201,19 +196,19 @@ function addData(){
     document.getElementById("file").value="";
 }
 
+/* 💾 SAVE RECORD */
+function saveData(){
+    localStorage.setItem("cars", JSON.stringify(data));
+    alert("Records Saved Successfully ✔");
+}
+
 /* RENDER */
 function render(){
 
     let table = document.getElementById("tableData");
     table.innerHTML="";
 
-    let q = document.getElementById("search").value.toLowerCase();
-
-    let filtered = data.filter(item =>
-        item.searchKey.includes(q)
-    );
-
-    filtered.forEach(item=>{
+    data.forEach(item=>{
         table.innerHTML += `
         <tr>
             <td>${item.car}</td>
@@ -230,26 +225,6 @@ function render(){
 }
 
 render();
-
-/* PDF DOWNLOAD */
-function downloadPDF(){
-
-    const { jsPDF } = window.jspdf;
-
-    html2canvas(document.querySelector(".card")).then(canvas=>{
-
-        let pdf = new jsPDF("p","mm","a4");
-
-        let img = canvas.toDataURL("image/png");
-
-        let w = 190;
-        let h = canvas.height * w / canvas.width;
-
-        pdf.addImage(img,"PNG",10,10,w,h);
-
-        pdf.save("Car_Transfer_Invoice.pdf");
-    });
-}
 
 </script>
 
