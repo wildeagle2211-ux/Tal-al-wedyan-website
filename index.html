@@ -1,34 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>شركة تل الوديان للتجارة</title>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
 <style>
 
 body{
     margin:0;
     font-family:Arial;
-    background:#0f172a;
+    background:#1e3c72;
+    color:white;
 }
 
 /* LOGIN */
 #loginPage{
-    width:360px;
+    width:320px;
     margin:80px auto;
     background:white;
+    color:black;
     padding:20px;
-    border-radius:12px;
+    border-radius:10px;
     text-align:center;
 }
 
+/* APP */
+.container{
+    max-width:1000px;
+    margin:20px auto;
+    background:white;
+    color:black;
+    padding:20px;
+    border-radius:10px;
+}
+
 /* INPUT */
-input,select{
+input{
     width:100%;
     padding:10px;
     margin:8px 0;
@@ -41,139 +49,78 @@ button{
     border:none;
     background:#2563eb;
     color:white;
-    border-radius:8px;
+    border-radius:6px;
     cursor:pointer;
 }
 
-/* MAIN */
-.container{
-    max-width:1100px;
-    margin:20px auto;
-    background:white;
-    padding:20px;
-    border-radius:12px;
-}
-
-/* HEADER */
-header{
-    text-align:center;
-    background:#111827;
-    color:white;
-    padding:15px;
-    border-radius:10px;
+button:hover{
+    background:#1e40af;
 }
 
 /* CARD */
 .card{
-    position:relative;
     background:#f8fafc;
     padding:15px;
-    margin-top:15px;
-    border-radius:10px;
+    margin-top:10px;
+    border-radius:8px;
     border-left:5px solid #2563eb;
-    overflow:hidden;
 }
 
-/* WATERMARK (COMPANY NAME PRINT LOOK) */
-.card::after{
-    content:"شركة تل الوديان للتجارة";
-    position:absolute;
-    font-size:30px;
-    color:rgba(0,0,0,0.05);
-    transform:rotate(-20deg);
-    top:40%;
-    left:10%;
-}
-
-/* IMAGE FIX */
 img{
     width:120px;
     margin-top:10px;
-    border-radius:8px;
-}
-
-/* PRINT FIX (IMPORTANT) */
-@media print{
-
-    body{
-        background:white;
-    }
-
-    button{
-        display:none;
-    }
-
-    .card{
-        page-break-inside:avoid;
-    }
-
-    /* make watermark visible better */
-    .card::after{
-        color:rgba(0,0,0,0.08);
-    }
-
+    border-radius:6px;
 }
 
 .hidden{display:none;}
 
-</style>
+/* SUCCESS MESSAGE */
+#msg{
+    color:green;
+    font-weight:bold;
+}
 
+</style>
 </head>
 
 <body>
 
 <!-- LOGIN -->
 <div id="loginPage">
-
 <h2>Login</h2>
-
 <input id="user" placeholder="Username">
 <input id="pass" type="password" placeholder="Password">
-
 <button onclick="login()">Login</button>
-
+<p>admin / 1234</p>
 </div>
 
 <!-- APP -->
 <div id="app" class="hidden">
 
-<header>
-<h1>شركة تل الوديان للتجارة</h1>
-<p>Vehicle Management System</p>
-</header>
-
 <div class="container">
 
-<!-- ADMIN -->
-<div id="admin">
+<h2>شركة تل الوديان للتجارة</h2>
 
-<h2>Add Car</h2>
+<!-- MESSAGE -->
+<p id="msg"></p>
+
+<!-- FORM -->
+<h3>Add Car</h3>
 
 <input id="carName" placeholder="Car Name">
 <input id="plate" placeholder="Plate Number">
-<input id="model" placeholder="Model">
 <input id="customer" placeholder="Customer Name">
-<input id="phone" placeholder="Phone">
-<input id="price" placeholder="Price VAT">
-<input id="fee" placeholder="Transfer Fee">
 
-<!-- FIX IMAGE -->
 <input id="image" type="file">
 
-<button onclick="addCar()">Save Car</button>
+<button onclick="addCar()">Save Data</button>
+<button onclick="window.print()">Print</button>
 
-</div>
+<hr>
 
-<!-- RECORDS -->
-<div id="records" class="hidden">
-
-<h2>Car Records</h2>
-
-<button onclick="window.print()">Print Invoice</button>
+<h3>Records</h3>
 
 <div id="list"></div>
-
-</div>
 
 </div>
 
@@ -182,77 +129,54 @@ img{
 <script>
 
 let cars=[];
-let inv=1;
 
 /* LOGIN */
 function login(){
-
 if(user.value==="admin" && pass.value==="1234"){
-loginPage.classList.add("hidden");
-app.classList.remove("hidden");
-show('admin');
+loginPage.style.display="none";
+app.style.display="block";
+}else{
+alert("Wrong login");
 }
-
-}
-
-/* SHOW */
-function show(id){
-
-admin.classList.add("hidden");
-records.classList.add("hidden");
-
-document.getElementById(id).classList.remove("hidden");
-
-render();
-
 }
 
 /* ADD CAR */
 function addCar(){
 
-let code="INV-"+String(inv++).padStart(2,'0');
-
-/* FIX IMAGE SAVE (base64 for print) */
 let file=image.files[0];
+
+if(file){
 
 let reader=new FileReader();
 
 reader.onload=function(){
 
-let car={
-invoice:code,
+cars.push({
 name:carName.value,
 plate:plate.value,
-model:model.value,
 customer:customer.value,
-phone:phone.value,
-price:price.value,
-fee:fee.value,
 img:reader.result
-};
+});
 
-cars.push(car);
+msg.innerText="✔ Data saved successfully";
+
 render();
 
 };
 
-if(file){
 reader.readAsDataURL(file);
+
 }else{
 
-let car={
-invoice:code,
+cars.push({
 name:carName.value,
 plate:plate.value,
-model:model.value,
 customer:customer.value,
-phone:phone.value,
-price:price.value,
-fee:fee.value,
 img:""
-};
+});
 
-cars.push(car);
+msg.innerText="✔ Data saved successfully";
+
 render();
 
 }
@@ -264,26 +188,16 @@ function render(){
 
 let html="";
 
-cars.forEach((c,i)=>{
+cars.forEach(c=>{
 
 html+=`
 <div class="card">
 
-<h2>${c.invoice}</h2>
-
 <p><b>Car:</b> ${c.name}</p>
 <p><b>Plate:</b> ${c.plate}</p>
-<p><b>Model:</b> ${c.model}</p>
 <p><b>Customer:</b> ${c.customer}</p>
-<p><b>Phone:</b> ${c.phone}</p>
-<p><b>Price:</b> ${c.price}</p>
-<p><b>Fee:</b> ${c.fee}</p>
 
-${c.img ? `<img src="${c.img}">` : ""}
-
-<div id="qr${i}"></div>
-
-<button onclick="makeQR('${c.invoice}','qr${i}')">Generate QR</button>
+${c.img ? `<img src="${c.img}">` : "<p>No Image</p>"}
 
 </div>
 `;
@@ -291,19 +205,6 @@ ${c.img ? `<img src="${c.img}">` : ""}
 });
 
 list.innerHTML=html;
-
-}
-
-/* QR FIX (AUTO CALL ALSO) */
-function makeQR(text,id){
-
-document.getElementById(id).innerHTML="";
-
-new QRCode(document.getElementById(id),{
-text:text,
-width:100,
-height:100
-});
 
 }
 
