@@ -11,19 +11,28 @@ body{
     padding:20px;
     background:#0f172a;
     color:white;
-    transition:0.3s;
 }
 
-.container{
-    max-width:1000px;
-    margin:auto;
+/* LOGIN */
+#loginBox{
+    position:fixed;
+    inset:0;
+    background:#000000ee;
+    display:flex;
+    justify-content:center;
+    align-items:center;
 }
 
-.card{
+.loginCard{
     background:#111827;
     padding:20px;
-    border-radius:12px;
+    border-radius:10px;
+    width:300px;
 }
+
+/* MAIN */
+.container{max-width:1000px;margin:auto;}
+.card{background:#111827;padding:20px;border-radius:12px;}
 
 input, select{
     width:100%;
@@ -43,10 +52,6 @@ button{
     margin:5px;
 }
 
-.lang{
-    background:#22c55e;
-}
-
 table{
     width:100%;
     margin-top:20px;
@@ -62,35 +67,39 @@ th, td{
 th{
     background:#1f2937;
 }
-
-/* RTL SUPPORT */
-.rtl{
-    direction:rtl;
-    text-align:right;
-}
-
-.rtl input, .rtl select{
-    text-align:right;
-}
 </style>
 
 </head>
 
 <body>
 
+<!-- 🔐 LOGIN -->
+<div id="loginBox">
+    <div class="loginCard">
+        <h3>Login</h3>
+        <p>Hint: Password 1234</p>
+        <input type="password" id="pass">
+        <button onclick="login()">Login</button>
+    </div>
+</div>
+
 <div class="container">
 
 <div class="card">
 
-<h2 id="title">🚗 Car Transfer System Pro</h2>
+<h2>🚗 Car Transfer System Pro</h2>
 
-<button class="lang" onclick="setLang('en')">English</button>
-<button class="lang" onclick="setLang('ar')">العربية</button>
+<!-- 🔍 SEARCH -->
+<input type="text" id="search" placeholder="Search Car / Name / Plate / ا ب ت 123" onkeyup="render()">
 
+<!-- FORM -->
 <input type="text" id="car" placeholder="Car Name / اسم السيارة">
 <input type="text" id="customer" placeholder="Customer Name / اسم العميل">
 <input type="text" id="phone" placeholder="Phone Number / رقم الهاتف">
 <input type="number" id="fee" placeholder="Transfer Fee / رسوم النقل">
+
+<!-- 📝 REASON ADDED -->
+<input type="text" id="reason" placeholder="Reason (if not transferred) / سبب عدم النقل">
 
 <select id="status">
     <option value="Completed">Completed / تم النقل</option>
@@ -105,29 +114,38 @@ th{
 <table>
 <thead>
 <tr>
-<th>Car / سيارة</th>
-<th>Customer / عميل</th>
-<th>Phone / هاتف</th>
-<th>Fee / رسوم</th>
-<th>Status / حالة</th>
-<th>File / ملف</th>
+<th>Car</th>
+<th>Customer</th>
+<th>Phone</th>
+<th>Fee</th>
+<th>Status</th>
+<th>Reason</th>
+<th>File</th>
 </tr>
 </thead>
 
 <tbody id="tableData"></tbody>
-
 </table>
 
 </div>
-
 </div>
 
 <script>
 
 let data = JSON.parse(localStorage.getItem("cars")) || [];
-render();
+let password = localStorage.getItem("pass") || "1234";
 
-// ADD DATA
+/* 🔐 LOGIN */
+function login(){
+    let p = document.getElementById("pass").value;
+    if(p === password){
+        document.getElementById("loginBox").style.display="none";
+    }else{
+        alert("Wrong Password");
+    }
+}
+
+/* ADD DATA */
 function addData(){
 
     let car = document.getElementById("car").value;
@@ -135,6 +153,7 @@ function addData(){
     let phone = document.getElementById("phone").value;
     let fee = document.getElementById("fee").value;
     let status = document.getElementById("status").value;
+    let reason = document.getElementById("reason").value;
 
     let fileInput = document.getElementById("file");
     let fileName = fileInput.files.length > 0 ? fileInput.files[0].name : "";
@@ -150,7 +169,9 @@ function addData(){
         phone,
         fee,
         status,
-        file:fileName
+        reason,
+        file:fileName,
+        searchKey:(car+" "+customer+" "+phone+" "+reason).toLowerCase()
     });
 
     localStorage.setItem("cars", JSON.stringify(data));
@@ -161,15 +182,23 @@ function addData(){
     document.getElementById("customer").value="";
     document.getElementById("phone").value="";
     document.getElementById("fee").value="";
+    document.getElementById("reason").value="";
     document.getElementById("file").value="";
 }
 
-// RENDER
+/* RENDER + SMART SEARCH */
 function render(){
+
     let table = document.getElementById("tableData");
     table.innerHTML="";
 
-    data.forEach(item=>{
+    let q = document.getElementById("search").value.toLowerCase();
+
+    let filtered = data.filter(item =>
+        item.searchKey.includes(q)
+    );
+
+    filtered.forEach(item=>{
         table.innerHTML += `
         <tr>
             <td>${item.car}</td>
@@ -177,23 +206,14 @@ function render(){
             <td>${item.phone}</td>
             <td>${item.fee}</td>
             <td>${item.status}</td>
+            <td>${item.reason || "-"}</td>
             <td>${item.file || "-"}</td>
         </tr>
         `;
     });
 }
 
-// LANGUAGE SWITCH
-function setLang(lang){
-
-    if(lang === "ar"){
-        document.body.classList.add("rtl");
-        document.getElementById("title").innerText = "🚗 نظام نقل السيارات الاحترافي";
-    }else{
-        document.body.classList.remove("rtl");
-        document.getElementById("title").innerText = "🚗 Car Transfer System Pro";
-    }
-}
+render();
 
 </script>
 
